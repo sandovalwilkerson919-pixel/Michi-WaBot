@@ -14,8 +14,8 @@ async function isAdminOrOwner(m, conn) {
   }
 }
 
-const handler = async (m, { conn, command, args, isAdmin, isOwner }) => {
-  if (!m.isGroup) return m.reply('🔒 Solo funciona en grupos.')
+const handler = async (m, { conn, command, args, isAdmin }) => {
+  if (!m.isGroup) return conn.sendMessage(m.chat, { text: '🔒 Este comando solo funciona en grupos.', ...global.rcanal }, { quoted: m })
 
   if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
   const chat = global.db.data.chats[m.chat]
@@ -23,31 +23,31 @@ const handler = async (m, { conn, command, args, isAdmin, isOwner }) => {
   const enable = command === 'on'
 
   if (!['antilink', 'welcome', 'antiarabe', 'modoadmin'].includes(type)) {
-    return m.reply(`✳️ Usa:\n*.on antilink* / *.off antilink*\n*.on welcome* / *.off welcome*\n*.on antiarabe* / *.off antiarabe*\n*.on modoadmin* / *.off modoadmin*`)
+    return conn.sendMessage(m.chat, { text: `✳️ Opciones válidas:\n\n🌾 •⟩ *.on antilink* / *.off antilink*\n🌾 •⟩ *.on welcome* / *.off welcome*\n🌾 •⟩ *.on antiarabe* / *.off antiarabe*\n🌾 •⟩ *.on modoadmin* / *.off modoadmin*`, ...global.rcanal }, { quoted: m })
   }
 
-  if (!isAdmin) return m.reply('❌ Solo admins (no owner) pueden activar o desactivar funciones.')
+  if (!isAdmin) return conn.sendMessage(m.chat, { text: '❌ Solo *admins* pueden activar o desactivar funciones.', ...global.rcanal }, { quoted: m })
 
   if (type === 'antilink') {
     chat.antilink = enable
     if(!chat.antilinkWarns) chat.antilinkWarns = {}
     if(!enable) chat.antilinkWarns = {}
-    return m.reply(`✅ Antilink ${enable ? 'activado' : 'desactivado'}.`)
+    return conn.sendMessage(m.chat, { text: `✅ *Antilink* ${enable ? '🟢 activado' : '🔴 desactivado'}.`, ...global.rcanal }, { quoted: m })
   }
 
   if (type === 'welcome') {
     chat.welcome = enable
-    return m.reply(`✅ Welcome ${enable ? 'activado' : 'desactivado'}.`)
+    return conn.sendMessage(m.chat, { text: `✅ *Welcome* ${enable ? '🟢 activado' : '🔴 desactivado'}.`, ...global.rcanal }, { quoted: m })
   }
 
   if (type === 'antiarabe') {
     chat.antiarabe = enable
-    return m.reply(`✅ Antiarabe ${enable ? 'activado' : 'desactivado'}.`)
+    return conn.sendMessage(m.chat, { text: `✅ *Anti-árabe* ${enable ? '🟢 activado' : '🔴 desactivado'}.`, ...global.rcanal }, { quoted: m })
   }
 
   if (type === 'modoadmin') {
     chat.modoadmin = enable
-    return m.reply(`✅ Modo Admin ${enable ? 'activado' : 'desactivado'}.`)
+    return conn.sendMessage(m.chat, { text: `✅ *Modo Admin* ${enable ? '🟢 activado' : '🔴 desactivado'}.`, ...global.rcanal }, { quoted: m })
   }
 }
 
@@ -77,7 +77,7 @@ handler.before = async (m, { conn }) => {
     const isArab = arabicPrefixes.some(prefix => number.startsWith(prefix))
 
     if (isArab) {
-      await conn.sendMessage(m.chat, { text: `Este pndj ${newJid} será expulsado, no queremos العرب aca, adiosito. [ Anti Arabe Activado ]` })
+      await conn.sendMessage(m.chat, { text: `🚷 El usuario *${newJid}* fue detectado con prefijo árabe.\n\n> [ Anti-árabe 🟢 Activado ]`, ...global.rcanal }, { quoted: m })
       await conn.groupParticipantsUpdate(m.chat, [newJid], 'remove')
       return true
     }
@@ -108,49 +108,35 @@ handler.before = async (m, { conn }) => {
 
       if (chat.antilinkWarns[m.sender] < 3) {
         try {
-          await conn.sendMessage(m.chat, {
-            text: `🚫 Hey ${userTag}, no se permiten links aquí. Esta es tu advertencia ${chat.antilinkWarns[m.sender]}/3.`,
-            mentions: [m.sender]
+          await conn.sendMessage(m.chat, { 
+            text: `⚠️ Hey ${userTag}, los *links* no están permitidos.\n\n> Advertencia ${chat.antilinkWarns[m.sender]}/3`, 
+            mentions: [m.sender], 
+            ...global.rcanal 
           }, { quoted: m })
 
           await conn.sendMessage(m.chat, {
-            delete: {
-              remoteJid: m.chat,
-              fromMe: false,
-              id: msgID,
-              participant: delet
-            }
+            delete: { remoteJid: m.chat, fromMe: false, id: msgID, participant: delet }
           })
         } catch {
-          await conn.sendMessage(m.chat, {
-            text: `⚠️ No pude eliminar el mensaje de ${userTag}.`,
-            mentions: [m.sender]
-          }, { quoted: m })
+          await conn.sendMessage(m.chat, { text: `⚠️ No pude eliminar el mensaje de ${userTag}.`, mentions: [m.sender], ...global.rcanal }, { quoted: m })
         }
       } else {
         try {
-          await conn.sendMessage(m.chat, {
-            text: `🚫 ${userTag} alcanzó 3 advertencias por enviar links. Ahora serás expulsado.`,
-            mentions: [m.sender]
+          await conn.sendMessage(m.chat, { 
+            text: `🚫 ${userTag} llegó al límite de 3 advertencias por links.\n> Será *expulsado* del grupo.`, 
+            mentions: [m.sender], 
+            ...global.rcanal 
           }, { quoted: m })
 
-          await conn.sendMessage(m.chat, {
-            delete: {
-              remoteJid: m.chat,
-              fromMe: false,
-              id: msgID,
-              participant: delet
-            }
+          await conn.sendMessage(m.chat, { 
+            delete: { remoteJid: m.chat, fromMe: false, id: msgID, participant: delet } 
           })
 
           await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
 
           chat.antilinkWarns[m.sender] = 0
         } catch {
-          await conn.sendMessage(m.chat, {
-            text: `⚠️ No pude expulsar a ${userTag}. Puede que no tenga permisos.`,
-            mentions: [m.sender]
-          }, { quoted: m })
+          await conn.sendMessage(m.chat, { text: `⚠️ No pude expulsar a ${userTag}. Puede que no tenga permisos.`, mentions: [m.sender], ...global.rcanal }, { quoted: m })
         }
       }
 
@@ -175,8 +161,8 @@ handler.before = async (m, { conn }) => {
     const externalAdReply = {
       forwardingScore: 999,
       isForwarded: true,
-      title: `${isLeaving ? '🍿 Adiós' : '🍿 Bienvenido'}`,
-      body: `🧃 Grupo con ${groupSize} miembros`,
+      title: `${isLeaving ? '🍿 Adiós' : '🌟 Bienvenido'}`,
+      body: `👥 Miembros actuales: ${groupSize}`,
       mediaType: 1,
       renderLargerThumbnail: true,
       thumbnailUrl: profilePic,
@@ -184,34 +170,24 @@ handler.before = async (m, { conn }) => {
     }
 
     if (!isLeaving) {
-      const txtWelcome = '🌟 BIENVENIDO/A 🌟'
       const bienvenida = `
-👋 Hola ${userMention}!
+🧃ㅤׅㅤHola ${userMention}  
 
-🙌 Te damos la bienvenida a *${groupMetadata.subject}*  
-👥 Somos *${groupSize}* personas en esta comunidad.
-📌 Porfa sigue las reglas para que todos la pasemos chido.
-🛠️ Si necesitas ayuda, habla con algún admin.
-🌤️ Disfruta de tu estadia.
+🌿 Bienvenid@ a *${groupMetadata.subject}*  
+👥 Ahora somos *${groupSize}* personas en el grupo.  
+📌 Respeta las reglas para que la pasemos chido ✨  
 `.trim()
 
-      await conn.sendMessage(m.chat, {
-        text: `${txtWelcome}\n\n${bienvenida}`,
-        contextInfo: { mentionedJid: [userId], externalAdReply }
-      })
+      await conn.sendMessage(m.chat, { text: bienvenida, contextInfo: { mentionedJid: [userId], externalAdReply }, ...global.rcanal })
     } else {
-      const txtBye = '👋 HASTA PRONTO 👋'
       const despedida = `
-⚠️ El usuario ${userMention} ha salido de *${groupMetadata.subject}*  
-👥 Quedamos *${groupSize}* miembros.
-🙏 Gracias por tu tiempo y esperamos verte de nuevo pronto.
-💬 Recuerda que las puertas siempre están abiertas
+🥀ㅤ${userMention} salió de *${groupMetadata.subject}*  
+
+👥 Quedamos *${groupSize}* miembros.  
+🙏 Gracias por estar aquí, vuelve cuando quieras 🌸  
 `.trim()
 
-      await conn.sendMessage(m.chat, {
-        text: `${txtBye}\n\n${despedida}`,
-        contextInfo: { mentionedJid: [userId], externalAdReply }
-      })
+      await conn.sendMessage(m.chat, { text: despedida, contextInfo: { mentionedJid: [userId], externalAdReply }, ...global.rcanal })
     }
   }
 }
