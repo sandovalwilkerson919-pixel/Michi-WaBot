@@ -3,40 +3,41 @@ import { join } from 'path'
 import { xpRange } from '../lib/levelling.js'
 
 const tags = {
-  owner: '👑 PROPIETARIO',
-  serbot: '🫟 SUBBOTS',
-  eco: '💸 ECONOMÍA',
-  downloader: '⬇️ DESCARGAS',
-  tools: '🛠️ HERRAMIENTAS',
-  efectos: '🍿 EFECTOS',
-  info: 'ℹ️ INFORMACIÓN',
-  game: '🎮 JUEGOS',
-  gacha: '🎲 GACHA ANIME',
-  reacciones: '💕 ANIME REACCIONES',
-  group: '👥 GRUPOS',
-  search: '🔎 BUSCADORES',
-  sticker: '📌 STICKERS',
-  ia: '🤖 IA',
-  channel: '📺 CANALES',
-  fun: '😂 DIVERSIÓN',
+  owner: '👑 ꨶ ㅤPropietario',
+  serbot: '🫟 ㅤSubbots',
+  eco: '💸 ㅤEconomía',
+  downloader: '⬇️ ㅤDescargas',
+  tools: '🛠️ ㅤHerramientas',
+  efectos: '🍿 ㅤEfectos',
+  info: 'ℹ️ ㅤInformación',
+  game: '🎮 ㅤJuegos',
+  gacha: '🎲 ㅤGacha Anime',
+  reacciones: '💕 ㅤReacciones Anime',
+  group: '👥 ㅤGrupos',
+  search: '🔎 ㅤBuscadores',
+  sticker: '📌 ㅤStickers',
+  ia: '🤖 ㅤIA',
+  channel: '📺 ㅤCanales',
+  fun: '😂 ㅤDiversión',
 }
 
 const defaultMenu = {
   before: `
-🍂 Hola, Soy *%botname* (%tipo)
-*%name*, %greeting
+🧃ㅤׅㅤׄㅤHola soy *%botname* (%tipo) ㅤ֢ㅤׄ
 
-> 🪴 Canal: https://whatsapp.com/channel/0029VbArz9fAO7RGy2915k3O
+　ׅ🌳ㅤ *¿Cómo estas?* @%name
+ 
+🥞  ׄ  ְ *Fecha ›* %date
+🥮  ׄ  ְ *Hora ›* %hour
+`,
 
-🥞 DATE = *%date*
-🍿 ACTIVITY = *%uptime*
-%readmore
-`.trimStart(),
-
-  header: '\n`> %category`',
-  body: '🌴 *%cmd* %islimit %isPremium',
+  header: '*%category*\n',
+  body: '🌾 %cmd %islimit %isPremium',
   footer: '',
-  after: '\n🌤 Creador Ado\n🌿 Colaborador GianPoolS',
+  after: `
+> 🌿 Creador › Ado
+> ✨ Colaborador › GianPoolS
+`
 }
 
 const handler = async (m, { conn, usedPrefix: _p }) => {
@@ -47,6 +48,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
     const d = new Date(Date.now() + 3600000)
     const date = d.toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })
+    const hour = d.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: true })
 
     const help = Object.values(global.plugins)
       .filter(p => !p.disabled)
@@ -60,8 +62,9 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
     let fkontak = { 
       key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net" },
-      message: { imageMessage: { caption: "Menu De Comandos 🥦", jpegThumbnail: Buffer.alloc(0) }}
+      message: { imageMessage: { caption: "Menú de comandos", jpegThumbnail: Buffer.alloc(0) }}
     }
+
     let nombreBot = global.namebot || 'Bot'
     let bannerFinal = 'https://iili.io/KJXN7yB.jpg'
 
@@ -75,7 +78,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       } catch {}
     }
 
-    const tipo = conn.user?.jid === global.conn?.user?.jid ? '𝖯𝗋𝗂𝗇𝖼𝗂𝗉𝖺𝗅' : '𝖲𝗈𝖼𝗄𝖾𝗍'
+    const tipo = conn.user?.jid === global.conn?.user?.jid ? 'Principal' : 'Socket'
     const menuConfig = conn.menu || defaultMenu
 
     const _text = [
@@ -87,7 +90,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
             menuConfig.body
               .replace(/%cmd/g, menu.prefix ? h : `${_p}${h}`)
               .replace(/%islimit/g, menu.limit ? '⭐' : '')
-              .replace(/%isPremium/g, menu.premium ? '🪪' : '')
+              .replace(/%isPremium/g, menu.premium ? '💎' : '')
           ).join('\n')).join('\n')
         return [menuConfig.header.replace(/%category/g, tags[tag]), cmds, menuConfig.footer].join('\n')
       }),
@@ -107,10 +110,11 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       limit,
       name,
       date,
+      hour,
       uptime: clockString(process.uptime() * 1000),
       tipo,
+      group: m.isGroup ? await conn.getName(m.chat) : 'Privado',
       readmore: readMore,
-      greeting,
     }
 
     const text = _text.replace(
@@ -118,39 +122,34 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       (_, name) => String(replace[name])
     )
 
-    const isURL = /^https?:\/\//i.test(bannerFinal)
-    const imageContent = isURL 
-      ? { image: { url: bannerFinal } } 
-      : { image: fs.readFileSync(bannerFinal) }
-
-    await conn.sendMessage(m.chat, { react: { text: '😺', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '📋', key: m.key } })
     await conn.sendMessage(
-  m.chat,
-  { 
-    text: text.trim(),
-    footer: 'Menu de comandos',
-    headerType: 4,
-    contextInfo: {
-      externalAdReply: {
-        title: nombreBot,
-        body: "🌿 Menú Oficial",
-        thumbnailUrl: bannerFinal,
-        sourceUrl: "https://whatsapp.com/channel/0029VbArz9fAO7RGy2915k3O",
-        mediaType: 1,
-        renderLargerThumbnail: true
+      m.chat,
+      { 
+        text: text.trim(),
+        footer: 'Menú de comandos 📑',
+        headerType: 4,
+        contextInfo: {
+          externalAdReply: {
+            title: nombreBot,
+            body: "🌟 Menú oficial de comandos",
+            thumbnailUrl: bannerFinal,
+            sourceUrl: "https://whatsapp.com/channel/0029VbArz9fAO7RGy2915k3O",
+            mediaType: 1,
+            renderLargerThumbnail: true
+          },
+          mentionedJid: conn.parseMention(text)
+        }
       },
-      mentionedJid: conn.parseMention(text)
-    }
-  },
-  { quoted: fkontak }
-)
+      { quoted: fkontak }
+    )
   } catch (e) {
     console.error('❌ Error en el menú:', e)
-    conn.reply(m.chat, '❎ Lo sentimos, el menú tiene un error.', m)
+    conn.reply(m.chat, '❎ Ocurrió un error al mostrar el menú.', m)
   }
 }
 
-handler.command = ['m', 'menu', 'help', 'hélp', 'menú', 'ayuda']
+handler.command = ['m', 'menu', 'help', 'ayuda']
 handler.register = false
 export default handler
 
@@ -164,16 +163,3 @@ function clockString(ms) {
   let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
   return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':')
 }
-
-const hour = new Date().getHours()
-const greetingMap = {
-  0: 'una noche tranquila 🌙', 1: 'una noche tranquila 🌙', 2: 'una noche tranquila 🌙',
-  3: 'una mañana tranquila ☀️', 4: 'una mañana tranquila ☀️', 5: 'una mañana tranquila ☀️',
-  6: 'una mañana tranquila ☀️', 7: 'una mañana tranquila ☀️', 8: 'una mañana tranquila ☀️',
-  9: 'un buen día ☀️', 10: 'un buen día ☀️', 11: 'un buen día ☀️',
-  12: 'un buen día ☀️', 13: 'un buen día ☀️', 14: 'una tarde tranquila 🌇',
-  15: 'una tarde tranquila 🌇', 16: 'una tarde tranquila 🌇', 17: 'una tarde tranquila 🌇',
-  18: 'una noche tranquila 🌙', 19: 'una noche tranquila 🌙', 20: 'una noche tranquila 🌙',
-  21: 'una noche tranquila 🌙', 22: 'una noche tranquila 🌙', 23: 'una noche tranquila 🌙',
-}
-const greeting = 'Espero que tengas ' + (greetingMap[hour] || 'un buen día')
