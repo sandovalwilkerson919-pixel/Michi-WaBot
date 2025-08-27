@@ -27,12 +27,12 @@ const defaultMenu = {
 
 　ׅ🌳ㅤ *¿Cómo estas?* @%name
  
-🥞  ׄ  ְ *Fecha ›* %date
-🥮  ׄ  ְ *Hora ›* %hour
+🥞  ׄ ְ *Fecha ›* %date
+🥮  ׄ ְ *Hora ›* %hour
 `,
 
-  header: '*%category*\n',
-  body: '🌾 %cmd %islimit %isPremium',
+  header: '> *_%category_*\n',
+  body: '🌾 •⟩ *%cmd* %islimit %isPremium',
   footer: '',
   after: `
 > 🌿 Creador › Ado
@@ -62,7 +62,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
     let fkontak = { 
       key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net" },
-      message: { imageMessage: { caption: "Menú de comandos", jpegThumbnail: Buffer.alloc(0) }}
+      message: { imageMessage: { caption: "🧃 Menu Completo", jpegThumbnail: Buffer.alloc(0) }}
     }
 
     let nombreBot = global.namebot || 'Bot'
@@ -132,9 +132,9 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
         contextInfo: {
           externalAdReply: {
             title: nombreBot,
-            body: "🌟 Menú oficial de comandos",
+            body: "",
             thumbnailUrl: bannerFinal,
-            sourceUrl: "https://whatsapp.com/channel/0029VbArz9fAO7RGy2915k3O",
+            sourceUrl: "myapiadonix.vercel.app",
             mediaType: 1,
             renderLargerThumbnail: true
           },
