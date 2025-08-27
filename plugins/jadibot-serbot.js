@@ -53,7 +53,7 @@ let time = global.db.data.users[m.sender].Subs + 120000
 
 const subBots = [...new Set([...global.conns.filter((conn) => conn.user && conn.ws.socket && conn.ws.socket.readyState !== ws.CLOSED).map((conn) => conn)])]
 const subBotsCount = subBots.length
-if (subBotsCount === 50) {
+if (subBotsCount === 100) {
 return m.reply(`No se han encontrado espacios para *Sub-Bots* disponibles.`)
 }
 
