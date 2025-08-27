@@ -178,7 +178,7 @@ handler.before = async (m, { conn }) => {
 📌 Respeta las reglas para que la pasemos chido ✨  
 `.trim()
 
-      await conn.sendMessage(m.chat, { text: bienvenida, contextInfo: { mentionedJid: [userId], externalAdReply }, ...global.rcanal })
+      await conn.sendMessage(m.chat, { text: bienvenida, contextInfo: { mentionedJid: [userId], externalAdReply } })
     } else {
       const despedida = `
 🥀ㅤ${userMention} salió de *${groupMetadata.subject}*  
@@ -187,9 +187,8 @@ handler.before = async (m, { conn }) => {
 🙏 Gracias por estar aquí, vuelve cuando quieras 🌸  
 `.trim()
 
-      await conn.sendMessage(m.chat, { text: despedida, contextInfo: { mentionedJid: [userId], externalAdReply }, ...global.rcanal })
+      await conn.sendMessage(m.chat, { text: despedida, contextInfo: { mentionedJid: [userId], externalAdReply } })
     }
   }
-}
 
 export default handler
