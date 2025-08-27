@@ -6,7 +6,7 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
     if (!text) {
         return conn.sendMessage(
             m.chat,
-            { text: `❌ ¿Qué quieres preguntar?\n\nEjemplo: ${usedPrefix + command}` },
+            { text: `❌ ¿Qué quieres preguntar?\n\nEjemplo: ${usedPrefix + command}`, ...global.rcanal },
             { quoted: m }
         );
     }
@@ -40,15 +40,10 @@ Tu creador es Ado`;
 
         let json = await openai(text, logic);
 
-        let fkontak = { 
-            "key": { "fromMe": false, "participant": "0@s.whatsapp.net", "remoteJid": "0@s.whatsapp.net" }, 
-            "message": { "contactMessage": { "displayName": "🍿 GPT 4o", "vcard": "BEGIN:VCARD\nVERSION:3.0\nFN:GPT 4\nTEL;type=CELL;type=VOICE;waid=0:0\nEND:VCARD" } } 
-        };
-
         await conn.sendMessage(
             m.chat,
-            { text: `\`🌤️ ChatGPT4o\`\n\n> ${json}` },
-            { quoted: fkontak }
+            { text: `\`🌴 ChatGPT\`\n\n> ${json}`, ...global.rcanal },
+            { quoted: m }
         );
 
         await m.react('🔥');
