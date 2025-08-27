@@ -193,7 +193,7 @@ handler.before = async (m, { conn }) => {
       await conn.sendMessage(m.chat, { text: despedida, contextInfo: { mentionedJid: [userId], externalAdReply } })
     }
 
-    return true // ✅ Muy importante para que se marque como manejado
+    return true 
   }
 
   return false
