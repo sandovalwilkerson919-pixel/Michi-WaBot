@@ -62,12 +62,14 @@ handler.before = async (m, { conn }) => {
   if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
   const chat = global.db.data.chats[m.chat]
 
+  // Modo Admin
   if (chat.modoadmin) {
     const groupMetadata = await conn.groupMetadata(m.chat)
     const isUserAdmin = groupMetadata.participants.find(p => p.id === m.sender)?.admin
     if (!isUserAdmin && !m.fromMe) return
   }
 
+  // Anti árabe
   if (chat.antiarabe && m.messageStubType === 27) {
     const newJid = m.messageStubParameters?.[0]
     if (!newJid) return
@@ -83,6 +85,7 @@ handler.before = async (m, { conn }) => {
     }
   }
 
+  // Anti link
   if (chat.antilink) {
     const groupMetadata = await conn.groupMetadata(m.chat)
     const isUserAdmin = groupMetadata.participants.find(p => p.id === m.sender)?.admin
@@ -133,7 +136,6 @@ handler.before = async (m, { conn }) => {
           })
 
           await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
-
           chat.antilinkWarns[m.sender] = 0
         } catch {
           await conn.sendMessage(m.chat, { text: `⚠️ No pude expulsar a ${userTag}. Puede que no tenga permisos.`, mentions: [m.sender], ...global.rcanal }, { quoted: m })
@@ -144,6 +146,7 @@ handler.before = async (m, { conn }) => {
     }
   }
 
+  // Bienvenida y despedida
   if (chat.welcome && [27, 28, 32].includes(m.messageStubType)) {
     const groupMetadata = await conn.groupMetadata(m.chat)
     const groupSize = groupMetadata.participants.length
@@ -171,7 +174,7 @@ handler.before = async (m, { conn }) => {
 
     if (!isLeaving) {
       const bienvenida = `
-🧃ㅤׅㅤHola ${userMention}  
+🧃ㅤHola ${userMention}  
 
 🌿 Bienvenid@ a *${groupMetadata.subject}*  
 👥 Ahora somos *${groupSize}* personas en el grupo.  
@@ -189,6 +192,11 @@ handler.before = async (m, { conn }) => {
 
       await conn.sendMessage(m.chat, { text: despedida, contextInfo: { mentionedJid: [userId], externalAdReply } })
     }
+
+    return true // ✅ Muy importante para que se marque como manejado
   }
+
+  return false
+}
 
 export default handler
