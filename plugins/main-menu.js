@@ -33,11 +33,10 @@ const defaultMenu = {
 
   header: '> *_%category_*\n',
   body: '🌾 •⟩ *%cmd* %islimit %isPremium',
-  footer: '',
-  after: `
-> 🌿 Creador › Ado
+  footer: '> 🌿 Creador › Ado
 > ✨ Colaborador › GianPoolS
-`
+',
+  after: ``
 }
 
 const handler = async (m, { conn, usedPrefix: _p }) => {
