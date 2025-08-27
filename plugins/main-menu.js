@@ -23,9 +23,9 @@ const tags = {
 
 const defaultMenu = {
   before: `
-🧃ㅤׅㅤׄㅤHola soy *%botname* (%tipo) ㅤ֢ㅤׄ
+🧃ㅤׅㅤׄㅤHola soy *%botname* *_(%tipo)_*
 
-　ׅ🌳ㅤ *¿Cómo estas?* @%name
+　ׅ🌳ㅤ *¿Cómo estas?* %name
  
 🥞  ׄ ְ *Fecha ›* %date
 🥮  ׄ ְ *Hora ›* %hour
@@ -78,7 +78,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       } catch {}
     }
 
-    const tipo = conn.user?.jid === global.conn?.user?.jid ? 'Principal' : 'Socket'
+    const tipo = conn.user?.jid === global.conn?.user?.jid ? 'Principal' : 'SubBot'
     const menuConfig = conn.menu || defaultMenu
 
     const _text = [
