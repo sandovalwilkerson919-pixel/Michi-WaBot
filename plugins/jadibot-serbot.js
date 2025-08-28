@@ -29,7 +29,7 @@ let rtx = `
 let rtx2 = `
 ⟩ Vincula usando el *código de 8 dígitos*  
 
-» Paso 1: Abre tu WhatsApp en tu celular  
+» Paso 1: Ve a los ︙ arriba lado derecho
 » Paso 2: Ve a *Dispositivos vinculados*  
 » Paso 3: Toca en *Vincular un dispositivo*  
 » Paso 4: Selecciona la opción *Vincular con el número de teléfono*  
