@@ -5,7 +5,7 @@ import Jimp from 'jimp'
 let handler = async (m, { conn, args }) => {
   const q = m.quoted ? m.quoted : m
   const mime = (q.msg || q).mimetype || ''
-  if (!mime.startsWith('image/')) return m.reply('*☂️ ¿Dónde está la imagen so pendejo/a*?')
+  if (!mime.startsWith('image/')) return m.reply('*☂️ ¿Dónde está la imagen?')
   
   let pixelSize = parseInt(args[0]) || 32
   if (pixelSize < 8) pixelSize = 8
@@ -23,7 +23,7 @@ let handler = async (m, { conn, args }) => {
     await conn.sendMessage(m.chat, { 
       image: buffer, 
       caption: `Imagen pixelada (tamaño: ${pixelSize})` 
-    }, { quoted: fkontak })
+    }, { quoted: m })
     
   } catch (e) {
     m.reply(e.message)
