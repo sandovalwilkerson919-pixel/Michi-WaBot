@@ -32,7 +32,7 @@ let rtx2 = `
 » Paso 1: Abre tu WhatsApp en tu celular  
 » Paso 2: Ve a *Dispositivos vinculados*  
 » Paso 3: Toca en *Vincular un dispositivo*  
-» Paso 4: Selecciona la opción *¿Usar código de teléfono?*  
+» Paso 4: Selecciona la opción *Vincular con el número de teléfono*  
 » Paso 5: Ingresa el *código de 8 dígitos* que se mostrará a continuación
 `.trim()
 
