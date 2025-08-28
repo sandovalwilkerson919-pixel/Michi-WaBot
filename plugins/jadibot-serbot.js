@@ -1,4 +1,4 @@
-import { useMultiFileAuthState, DisconnectReason, makeCacheableSignalKeyStore, fetchLatestBaileysVersion, generateWAMessageFromContent, proto } = (await import("@whiskeysockets/baileys"));
+const { useMultiFileAuthState, DisconnectReason, makeCacheableSignalKeyStore, fetchLatestBaileysVersion} = (await import("@whiskeysockets/baileys"));
 import qrcode from "qrcode"
 import NodeCache from "node-cache"
 import fs from "fs"
@@ -17,26 +17,9 @@ let crm3 = "SBpbmZvLWRvbmFyLmpz"
 let crm4 = "IF9hdXRvcmVzcG9uZGVyLmpzIGluZm8tYm90Lmpz"
 let drm1 = ""
 let drm2 = ""
-let rtx = `
-🎋 𝗩𝗶𝗻𝗰𝘂𝗹𝗮𝗰𝗶𝗼́𝗻 𝗽𝗼𝗿 𝗖𝗼́𝗱𝗶𝗴𝗼 𝗤𝗥
+let rtx = `⟩ Escanea este codigo *QR* para vincular`.trim()
 
-📌 𝗣𝗮𝘀𝗼𝘀 𝗽𝗮𝗿𝗮 𝘃𝗶𝗻𝗰𝘂𝗹𝗮𝗿 𝘁𝘂 𝗪𝗵𝗮𝘁𝘀𝗔𝗽𝗽:
-1️⃣ Abre 𝗪𝗵𝗮𝘁𝘀𝗔𝗽𝗽 en tu teléfono  
-2️⃣ Pulsa ⋮ *Más opciones* → *Dispositivos vinculados* 3️⃣ Presiona *"Vincular un dispositivo"* 4️⃣ Escanea el código QR que se mostrará aquí
-`.trim()
-
-let rtx2 = `
-🍁 𝗩𝗶𝗻𝗰𝘂𝗹𝗮𝗰𝗶𝗼́𝗻 𝗽𝗼𝗿 𝗖𝗼́𝗱𝗶𝗴𝗼 𝗠𝗮𝗻𝘂𝗮𝗹 (8 dígitos)
-
-📌 𝗣𝗮𝘀𝗼𝘀 𝗽𝗮𝗿𝗮 𝗵𝗮𝗰𝗲𝗿𝗹𝗼:
-1️⃣ Abre 𝗪𝗵𝗮𝘁𝘀𝗔𝗽𝗽 en tu teléfono  
-2️⃣ Pulsa ⋮ *Más opciones* → *Dispositivos vinculados* 3️⃣ Presiona *"Vincular un dispositivo"* 4️⃣ Selecciona *"Vincular con el número de teléfono"* e introduce el código mostrado  
-
-⚠️ 𝗜𝗺𝗽𝗼𝗿𝘁𝗮𝗻𝘁𝗲:  
-- Algunos grupos pueden fallar al generar el código  
-- Recomendado: Solicítalo por privado al bot  
-⏳ El código es válido solo para este número y expira en pocos segundos.
-`.trim()
+let rtx2 = `⟩ Escriba el *código de 8 dígitos* que se le brindará a continúacion:`.trim()
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -92,7 +75,7 @@ fs.mkdirSync(pathYukiJadiBot, { recursive: true })}
 try {
 args[0] && args[0] != undefined ? fs.writeFileSync(pathCreds, JSON.stringify(JSON.parse(Buffer.from(args[0], "base64").toString("utf-8")), null, '\t')) : ""
 } catch {
-conn.reply(m.chat, `Use correctamente el comando » ${usedPrefix + command} code`, m)
+conn.reply(m.chat, `${emoji} Use correctamente el comando » ${usedPrefix + command} code`, m)
 return
 }
 
@@ -119,59 +102,48 @@ generateHighQualityLinkPreview: true
 let sock = makeWASocket(connectionOptions)
 sock.isInit = false
 let isInit = true
-let qrSent = false;
 
 async function connectionUpdate(update) {
 const { connection, lastDisconnect, isNewLogin, qr } = update
 if (isNewLogin) sock.isInit = false
 if (qr && !mcode) {
-if (!qrSent && m?.chat) {
+if (m?.chat) {
 txtQR = await conn.sendMessage(m.chat, { image: await qrcode.toBuffer(qr, { scale: 8 }), caption: rtx.trim()}, { quoted: m})
-qrSent = true;
-if (txtQR && txtQR.key) {
-setTimeout(() => { conn.sendMessage(m.sender, { delete: txtQR.key })}, 45000)
+} else {
+return 
 }
+if (txtQR && txtQR.key) {
+setTimeout(() => { conn.sendMessage(m.sender, { delete: txtQR.key })}, 30000)
 }
 return
 } 
 if (qr && mcode) {
-    if (!qrSent) {
-        let secret = await sock.requestPairingCode((m.sender.split`@`[0]))
-        const caption = `${rtx2}\n\n*👇 Toca el botón para copiar el código 👇*`;
+let secret = await sock.requestPairingCode((m.sender.split`@`[0]))
+secret = secret.match(/.{1,4}/g)?.join("")
 
-        const buttonMsg = generateWAMessageFromContent(m.chat, {
-            viewOnceMessage: {
-                message: {
-                    messageContextInfo: {
-                        deviceListMetadata: {},
-                        deviceListMetadataVersion: 2
-                    },
-                    interactiveMessage: proto.Message.InteractiveMessage.create({
-                        body: proto.Message.InteractiveMessage.Body.create({ text: caption }),
-                        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                            buttons: [{
-                                name: 'cta_copy',
-                                buttonParamsJson: JSON.stringify({
-                                    display_text: '🧃 Copiar Código',
-                                    copy_code: secret
-                                })
-                            }]
-                        })
-                    })
-                }
-            }
-        }, { userJid: m.sender, quoted: m });
+txtCode = await conn.sendMessage(m.chat, {text : rtx2}, { quoted: m })
+codeBot = await m.reply(secret)
 
-        await conn.relayMessage(m.chat, buttonMsg.message, { messageId: buttonMsg.key.id });
-        qrSent = true;
-
-        if (buttonMsg.key) {
-            setTimeout(() => {
-                conn.sendMessage(m.chat, { delete: buttonMsg.key });
-            }, 45000);
-        }
-    }
+console.log(secret)
 }
+if (txtCode && txtCode.key) {
+setTimeout(() => { conn.sendMessage(m.sender, { delete: txtCode.key })}, 30000)
+}
+if (codeBot && codeBot.key) {
+setTimeout(() => { conn.sendMessage(m.sender, { delete: codeBot.key })}, 30000)
+}
+const endSesion = async (loaded) => {
+if (!loaded) {
+try {
+sock.ws.close()
+} catch {
+}
+sock.ev.removeAllListeners()
+let i = global.conns.indexOf(sock)                
+if (i < 0) return 
+delete global.conns[i]
+global.conns.splice(i, 1)
+}}
 
 const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode
 if (connection === 'close') {
@@ -227,11 +199,11 @@ await joinChannels(sock)
 }}
 setInterval(async () => {
 if (!sock.user) {
-try { sock.ws.close() } catch (e) {  
+try { sock.ws.close() } catch (e) {      
 
 }
 sock.ev.removeAllListeners()
-let i = global.conns.indexOf(sock)  
+let i = global.conns.indexOf(sock)                
 if (i < 0) return
 delete global.conns[i]
 global.conns.splice(i, 1)
