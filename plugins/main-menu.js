@@ -119,7 +119,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       (_, name) => String(replace[name])
     )
 
-    await conn.sendMessage(m.chat, { react: { text: '📋', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🧃', key: m.key } })
     await conn.sendMessage(
       m.chat,
       { 
