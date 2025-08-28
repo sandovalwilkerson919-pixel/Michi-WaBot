@@ -4,23 +4,28 @@ import fs from 'fs'
 import path from 'path'
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
-  if (!args[0]) return m.reply({
-    text: `
+  if (!args[0]) {
+    return m.reply({
+      text: `
 ⟩ ⚠️ *Uso correcto del comando:*  
 » ${usedPrefix + command} <enlace o nombre de canción/video>  
 
 ✦ Ejemplos:  
 • ${usedPrefix + command} https://youtu.be/abcd1234  
 • ${usedPrefix + command} nombre de la canción
-`, ...global.rcanal
-  })
+      `.trim(),
+      ...global.rcanal
+    })
+  }
 
   try {
     await m.react('🕓')
 
-    const botActual = conn.user?.jid?.split('@')[0].replace(/\D/g, '')
-    const configPath = path.join('./JadiBots', botActual, 'config.json')
+    const botId = conn.user?.jid?.split('@')[0].replace(/\D/g, '') || ''
+    const configPath = path.join('./JadiBots', botId, 'config.json')
+
     let nombreBot = global.namebot || '⎯⎯⎯⎯⎯⎯ Bot Principal ⎯⎯⎯⎯⎯⎯'
+
     if (fs.existsSync(configPath)) {
       try {
         const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
@@ -32,45 +37,52 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     let videoInfo = null
 
     if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
-      let search = await yts(args.join(' '))
-      if (!search.videos?.length) return m.reply({ text: '⚠️ No se encontraron resultados en YouTube.', ...global.rcanal })
+      const search = await yts(args.join(' '))
+      if (!search.videos?.length) {
+        return m.reply({ text: '⚠️ No se encontraron resultados en YouTube.', ...global.rcanal })
+      }
       videoInfo = search.videos[0]
       url = videoInfo.url
     } else {
-      let id = url.split('v=')[1]?.split('&')[0] || url.split('/').pop()
-      let search = await yts({ videoId: id })
+      const id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop()
+      const search = await yts({ videoId: id })
       if (search?.title) videoInfo = search
     }
 
-    if (videoInfo.seconds > 3780) return m.reply({ text: '⛔ El video supera el límite permitido de *63 minutos*.', ...global.rcanal })
+    if (videoInfo.seconds > 3780) {
+      return m.reply({ text: '⛔ El video supera el límite permitido de *63 minutos*.', ...global.rcanal })
+    }
 
     let apiUrl = ''
     let isAudio = false
-    if (command == 'play' || command == 'ytmp3') {
+
+    if (command === 'play' || command === 'ytmp3') {
       apiUrl = `https://myapiadonix.vercel.app/api/ytmp3?url=${encodeURIComponent(url)}`
       isAudio = true
-    } else if (command == 'play2' || command == 'ytmp4') {
+    } else if (command === 'play2' || command === 'ytmp4') {
       apiUrl = `https://myapiadonix.vercel.app/api/ytmp4?url=${encodeURIComponent(url)}`
-    } else return m.reply({ text: '❌ Comando no reconocido.', ...global.rcanal })
+    } else {
+      return m.reply({ text: '❌ Comando no reconocido.', ...global.rcanal })
+    }
 
-    let res = await fetch(apiUrl)
+    const res = await fetch(apiUrl)
     if (!res.ok) throw new Error('Error al conectar con la API.')
-    let json = await res.json()
+    const json = await res.json()
     if (!json.success) throw new Error('No se pudo obtener información del video.')
 
-    let { title, thumbnail, download, quality } = json.data
+    const { title, thumbnail, download, quality } = json.data
 
-    let dur = videoInfo.seconds || 0
-    let h = Math.floor(dur / 3600)
-    let m_ = Math.floor((dur % 3600) / 60)
-    let s = dur % 60
-    let duration = [h, m_, s].map(v => v.toString().padStart(2, '0')).join(':')
+    const dur = videoInfo.seconds || 0
+    const h = Math.floor(dur / 3600)
+    const m_ = Math.floor((dur % 3600) / 60)
+    const s = dur % 60
+    const duration = [h, m_, s].map(v => v.toString().padStart(2, '0')).join(':')
 
-    let views = videoInfo.views.toLocaleString()
-    let ago = videoInfo.ago || "N/D"
-    let author = videoInfo.author?.name || "Desconocido"
+    const views = videoInfo.views.toLocaleString()
+    const ago = videoInfo.ago || "N/D"
+    const author = videoInfo.author?.name || "Desconocido"
 
-    let caption = `⟩ ✦ *Información del video* ✦
+    const caption = `⟩ ✦ *Información del video* ✦
 
 » 🎬 *Título:* ${title}  
 » ⏱️ *Duración:* ${duration}  
@@ -103,14 +115,16 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     }
 
     await m.react('✅')
-  } catch (e) {
-    console.error(e)
+
+  } catch (error) {
+    console.error('Error en comando play/ytmp3/ytmp4:', error)
     await m.react('❌')
     m.reply({
       text: `
 ⟩ ❌ *Ocurrió un error procesando tu solicitud*  
 » Verifica que el enlace sea válido o inténtalo más tarde.
-`, ...global.rcanal
+      `.trim(),
+      ...global.rcanal
     })
   }
 }
