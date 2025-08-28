@@ -106,7 +106,7 @@ let handler = async (m, { conn, command, usedPrefix, args, text, isOwner }) => {
         .map((v, i) => `
 • ✦ 「 ${i + 1} 」  
 ⟩ 🧃 Usuario: ${v.user.name || 'Sub-Bot'}  
-⟩ 💎 Enlace: https://wa.me/${v.user.jid.replace(/[^0-9]/g, '')}?text=${usedPrefix}estado  
+⟩ 💎 Enlace: https://wa.me/${v.user.jid.replace(/[^0-9]/g, '')}?text=${usedPrefix}speed  
 ⟩ 🕑 Activo por: ${v.uptime ? msToTime(Date.now() - v.uptime) : 'Desconocido'}
         `.trim())
         .join('\n\n')
