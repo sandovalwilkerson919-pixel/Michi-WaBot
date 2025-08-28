@@ -68,7 +68,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     await conn.sendMessage(
       m.chat,
-      { text: `🕒 Generando tu imagen...\n⟩ Por favor espera un momento.`, ...global.rcanal },
+      { text: `🕒 Generando tu imagen...\n> Por favor espera un momento.`, ...global.rcanal },
       { quoted: m }
     )
 
