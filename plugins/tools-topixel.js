@@ -11,7 +11,7 @@ let handler = async (m, { conn, args }) => {
   if (pixelSize < 8) pixelSize = 8
   if (pixelSize > 1024) pixelSize = 1024
   
-  m.reply("🕓")
+  m.react("🕓")
   const media = await q.download()
   
   try {
