@@ -1,57 +1,31 @@
-import fetch from 'node-fetch'
+import fetch from 'node-fetch';
 
-async function mediafireDl(url) {
-  const res = await fetch(url)
-  const html = await res.text()
-
-  // Buscar enlace directo de descarga
-  const match = html.match(/https?:\/\/download[^"]+/i)
-  if (!match) throw new Error('No se encontró el enlace de descarga')
-
-  const directUrl = match[0]
-
-  // Nombre del archivo
-  const filename = directUrl.split('/').pop().split('?')[0]
-
-  // Tamaño (opcional, si aparece en la página)
-  const size = (html.match(/<li>File size: <span>(.*?)<\/span><\/li>/i) || [])[1] || 'Desconocido'
-
-  return {
-    url: directUrl,
-    filename,
-    size
-  }
-}
-
-// Ejemplo de handler
-let handler = async (m, { conn, args }) => {
-  if (!args[0]) return m.reply('🚩 Ingresa un link de MediaFire')
-  if (!args[0].includes('mediafire.com')) return m.reply('🚩 El enlace debe ser de MediaFire')
-
-  m.react('⏳')
+const handler = async (m, { conn, command }) => {
   try {
-    let file = await mediafireDl(args[0])
+    // Obtener lista desde GitHub
+    const ne = await (await fetch('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/anime/doraemon.txt')).text();
+    const nek = ne.split('\n');
+    const anime = nek[Math.floor(Math.random() * nek.length)];
 
-    let info = `
-乂  *M E D I A F I R E  -  D O W N L O A D*
+    if (!anime) throw 'Error al obtener imagen';
 
-✩ *Nombre:* ${file.filename}
-✩ *Tamaño:* ${file.size}
-✩ *Link directo:* ${file.url}
-`
-
-    await conn.sendMessage(m.chat, {
-      document: { url: file.url },
-      fileName: file.filename,
-      mimetype: 'application/octet-stream',
-      caption: info
-    }, { quoted: m })
-
-    m.react('✅')
+    // Enviar con botón
+    await conn.sendButton(
+      m.chat,
+      'Nyaww~ 🐾💗', // texto
+      namebot,      
+      anime,         // URL de la imagen
+      [['🔄 SIGUIENTE 🔄', `/${command}`]], // botones
+      m
+    );
   } catch (e) {
-    m.reply(`❌ Error: ${e.message}`)
+    m.reply('❌ Hubo un error al cargar la imagen.');
+    console.error(e);
   }
-}
+};
 
-handler.command = /^mf$/i
-export default handler
+handler.command = /^(doraemon)$/i;
+handler.tags = ['anime'];
+handler.help = ['doraemon'];
+
+export default handler;
