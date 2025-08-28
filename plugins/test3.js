@@ -7,7 +7,7 @@ let handler = async (m, { conn, command }) => {
     const randomkpop = body.split('\n').filter(v => v && v.startsWith('http'))
     const randomkpopx = randomkpop[Math.floor(Math.random() * randomkpop.length)]
 
-    // frases dinámicas
+    // Frases dinámicas
     const frases = [
       "✨ Disfruta de BlackPink en acción 💖",
       "🌸 Una imagen más de BlackPink 💟",
@@ -18,13 +18,36 @@ let handler = async (m, { conn, command }) => {
     ]
     const frase = frases[Math.floor(Math.random() * frases.length)]
 
+    // Lista de estilos de botones
+    const estilos = [
+      "💕 SIGUIENTE 💕",
+      "💞 SIGUIENTE 💞",
+      "🩷 SIGUIENTE 🩷",
+      "💌 SIGUIENTE 💌",
+      "🧡 SIGUIENTE 🧡",
+      "❤️ SIGUIENTE ❤️",
+      "💛 SIGUIENTE 💛",
+      "💚 SIGUIENTE 💚",
+      "🩵 SIGUIENTE 🩵",
+      "💙 SIGUIENTE 💙",
+      "💜 SIGUIENTE 💜",
+      "🤍 SIGUIENTE 🤍",
+      "❤️‍🔥 SIGUIENTE ❤️‍🔥",
+      "❣️ SIGUIENTE ❣️",
+      "💓 SIGUIENTE 💓",
+      "💗 SIGUIENTE 💗",
+      "💝 SIGUIENTE 💝",
+      "💖 SIGUIENTE 💖"
+    ]
+    const estilo = estilos[Math.floor(Math.random() * estilos.length)]
+
     conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key } })
     await conn.sendButton(
       m.chat,
       frase,
-      namebot, // aquí sigue tu variable namebot
+      namebot, // tu watermark o nombre del bot
       randomkpopx,
-      [['🔄 SIGUIENTE 🔄', `/${command}`]],
+      [[estilo, `/${command}`]], // Botón dinámico
       m
     )
   } catch (e) {
