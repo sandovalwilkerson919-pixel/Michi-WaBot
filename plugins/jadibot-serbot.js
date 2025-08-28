@@ -20,7 +20,7 @@ let drm2 = ""
 let rtx = `
 ⟩ Para vincular el bot con tu WhatsApp usa el método de *Código QR*  
 
-» Paso 1: Abre tu WhatsApp en tu celular  
+» Paso 1: Ve a los ︙ arriba lado derecho  
 » Paso 2: Ve a *Dispositivos vinculados*  
 » Paso 3: Toca en *Vincular un dispositivo*  
 » Paso 4: Escanea este *Código QR* que aparece aquí  
