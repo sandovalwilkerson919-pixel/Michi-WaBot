@@ -44,9 +44,9 @@ try {
   m.reply(`*Lista de grupos del Bot* 🤖\n\n*—◉ Total de grupos:* ${totalGroups}\n\n${txt}`.trim());
  }    
 };
-handler.help = ['groups', 'grouplist'];
-handler.tags = ['info'];
-handler.command = /^(groups|grouplist|listadegrupo|gruposlista|listagrupos|listgroup)$/i;
+handler.help = ['grups', 'gruplist'];
+handler.tags = [''];
+handler.command = ['grups']
 handler.rowner = true;
-handler.private = true
+handler.private = true;
 export default handler;
