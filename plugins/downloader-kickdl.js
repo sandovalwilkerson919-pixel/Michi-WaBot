@@ -43,7 +43,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
   }
 };
 
-handler.help = ['kickdl <url>'];
+handler.help = ['kickdl'];
 handler.tags = ['downloader'];
 handler.command = ['kickdl'];
 
