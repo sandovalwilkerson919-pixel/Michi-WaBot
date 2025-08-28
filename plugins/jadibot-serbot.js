@@ -188,19 +188,18 @@ fs.rmdirSync(pathYukiJadiBot, { recursive: true })
 if (global.db.data == null) loadDatabase()
 if (connection == `open`) {
 if (!global.db.data?.users) loadDatabase()
-let userName, userJid 
+await joinChannels(conn)
+let userName, userJid
 userName = sock.authState.creds.me.name || 'Anónimo'
 userJid = sock.authState.creds.me.jid || `${path.basename(pathYukiJadiBot)}@s.whatsapp.net`
 console.log(chalk.bold.cyanBright(`\n❒⸺⸺⸺⸺【• SUB-BOT •】⸺⸺⸺⸺❒\n│\n│ 🟢 ${userName} (+${path.basename(pathYukiJadiBot)}) conectado exitosamente.\n│\n❒⸺⸺⸺【• CONECTADO •】⸺⸺⸺❒`))
 sock.isInit = true
 global.conns.push(sock)
-await joinChannels(sock)
-
+m?.chat ? await conn.sendMessage(m.chat, {text: args[0] ? `@${m.sender.split('@')[0]}, ya estás conectado, leyendo mensajes entrantes...` : `@${m.sender.split('@')[0]}, genial ya eres parte de nuestra familia de Sub-Bots.`, mentions: [m.sender]}, { quoted: m }) : ''
 }}
 setInterval(async () => {
 if (!sock.user) {
 try { sock.ws.close() } catch (e) {      
-
 }
 sock.ev.removeAllListeners()
 let i = global.conns.indexOf(sock)                
@@ -216,7 +215,7 @@ const Handler = await import(`../handler.js?update=${Date.now()}`).catch(console
 if (Object.keys(Handler || {}).length) handler = Handler
 
 } catch (e) {
-console.error('Nuevo error: ', e)
+console.error('⚠️ Nuevo error: ', e)
 }
 if (restatConn) {
 const oldChats = sock.chats
