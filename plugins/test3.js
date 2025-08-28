@@ -1,31 +1,22 @@
-import fetch from 'node-fetch';
+import fetch from 'node-fetch'
 
-const handler = async (m, { conn, command }) => {
-  try {
-    const ne = await (await fetch('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/anime/doraemon.txt')).text();
-    const nek = ne.split('\n');
-    const anime = nek[Math.floor(Math.random() * nek.length)];
+let handler = async(m, { conn, args, usedPrefix, command }) => {
 
-    if (!anime) throw 'Error al obtener imagen';
+fetch('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/kpop/blackpink.txt').then(res => res.text()).then(body => {
 
-    await conn.sendMessage(m.chat, {
-      image: { url: anime },
-      caption: 'Nyaww~ 🐾💗',
-      footer: wm,
-      buttons: [
-        { buttonId: `/${command}`, buttonText: { displayText: '🔄 SIGUIENTE 🔄' }, type: 1 }
-      ],
-      headerType: 4
-    }, { quoted: m });
+let randomkpop = body.split('\n')
 
-  } catch (e) {
-    m.reply('❌ Hubo un error al cargar la imagen.');
-    console.error(e);
-  }
-};
+let randomkpopx = randomkpop[Math.floor(Math.random() * randomkpop.length)]
+conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key }})
+conn.sendButton(m.chat, `💟 Muchas veces viste a BlackPink 💌`, namebot, randomkpopx, [['🔄 SIGUIENTE 🔄', `/${command}`]], m)
 
-handler.command = /^(doraemon)$/i;
-handler.tags = ['anime'];
-handler.help = ['doraemon'];
+})}
 
-export default handler;
+handler.help = ['blackpink']
+
+handler.tags = ['']
+
+handler.command = ['blackpink']
+
+export default handler
+
