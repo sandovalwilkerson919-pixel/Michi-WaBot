@@ -6,12 +6,18 @@ import fs from 'fs'
 import path from 'path'
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
-  if (!args[0]) return m.reply(`⚠️ Uso correcto: ${usedPrefix + command} <enlace o nombre>`)
+  if (!args[0]) return m.reply(`
+⟩ ⚠️ *Uso correcto del comando:*  
+» ${usedPrefix + command} <enlace o nombre de canción/video>  
+
+✦ Ejemplos:  
+• ${usedPrefix + command} https://youtu.be/abcd1234  
+• ${usedPrefix + command} nombre de la canción
+`)
 
   try {
     await m.react('🕓')
 
-  
     const botActual = conn.user?.jid?.split('@')[0].replace(/\D/g, '')
     const configPath = path.join('./JadiBots', botActual, 'config.json')
     let nombreBot = global.namebot || '⎯⎯⎯⎯⎯⎯ Bot Principal ⎯⎯⎯⎯⎯⎯'
@@ -22,13 +28,12 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       } catch {}
     }
 
-    
     let url = args[0]
     let videoInfo = null
 
     if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
       let search = await yts(args.join(' '))
-      if (!search.videos?.length) return m.reply('⚠️ No se encontraron resultados.')
+      if (!search.videos?.length) return m.reply('⚠️ No se encontraron resultados en YouTube.')
       videoInfo = search.videos[0]
       url = videoInfo.url
     } else {
@@ -37,12 +42,10 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       if (search?.title) videoInfo = search
     }
 
-    if (videoInfo.seconds > 3780) return m.reply('⛔ El video supera el límite de 63 minutos.')
+    if (videoInfo.seconds > 3780) return m.reply('⛔ El video supera el límite permitido de *63 minutos*.')
 
-    
     let apiUrl = ''
     let isAudio = false
-
     if (command == 'play' || command == 'ytmp3') {
       apiUrl = `https://myapiadonix.vercel.app/api/ytmp3?url=${encodeURIComponent(url)}`
       isAudio = true
@@ -55,9 +58,8 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     let json = await res.json()
     if (!json.success) throw new Error('No se pudo obtener información del video.')
 
-    let { title, thumbnail, quality, download } = json.data
+    let { title, thumbnail, download, quality } = json.data
 
-    
     let fkontak = {
       key: { fromMe: false, participant: "0@s.whatsapp.net", remoteJid: "status@broadcast" },
       message: {
@@ -69,23 +71,31 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       }
     }
 
-    
     let dur = videoInfo.seconds || 0
     let h = Math.floor(dur / 3600)
     let m_ = Math.floor((dur % 3600) / 60)
     let s = dur % 60
     let duration = [h, m_, s].map(v => v.toString().padStart(2, '0')).join(':')
 
-    
-    let caption = `> 🎬 *${title}*
-> ⏱️ Duración: ${duration}`
+    let views = videoInfo.views.toLocaleString()
+    let ago = videoInfo.ago || "N/D"
+    let author = videoInfo.author?.name || "Desconocido"
+
+    let caption = `
+⟩ ✦ *Información del video* ✦
+
+» 🎬 *Título:* ${title}  
+» ⏱️ *Duración:* ${duration}  
+» 👤 *Canal:* ${author}  
+» 👁️ *Vistas:* ${views}  
+» 📅 *Publicado:* ${ago}  
+» 📌 *Calidad:* ${quality || "Auto"}
+`
 
     await conn.sendMessage(m.chat, {
       image: { url: thumbnail },
       caption,
-      contextInfo: {
-        mentionedJid: [m.sender]
-      }
+      contextInfo: { mentionedJid: [m.sender] }
     }, { quoted: fkontak })
 
     if (isAudio) {
@@ -107,7 +117,10 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
   } catch (e) {
     console.error(e)
     await m.react('❌')
-    m.reply('❌ Ocurrió un error procesando tu solicitud.')
+    m.reply(`
+⟩ ❌ *Ocurrió un error procesando tu solicitud*  
+» Verifica que el enlace sea válido o inténtalo más tarde.
+`)
   }
 }
 
