@@ -3,111 +3,83 @@
 
 import TicTacToe from '../lib/tictactoe.js'
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-  conn.game = conn.game ? conn.game : {}
-  if (Object.values(conn.game).find(room => room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender))) {
-    return m.reply('Ya estás en una sala de TicTacToe.')
-  }
+let handler = m => m
 
-  let room = Object.values(conn.game).find(room => room.state === 'WAITING' && (text ? room.name === text : true))
-  if (room) {
-    // se une como O
-    room.o = m.chat
-    room.game.playerO = m.sender
-    room.state = 'PLAYING'
-    let arr = room.game.render().map((v, i) => [i + 1, v])
-    let str = `
-🎮 *TicTacToe*
+handler.before = async function (m, { conn }) {
+  conn.game = conn.game || {}
+  let room = Object.values(conn.game).find(room =>
+    room.id.startsWith('tictactoe') &&
+    room.state === 'PLAYING' &&
+    [room.game.playerX, room.game.playerO].includes(m.sender)
+  )
 
-❌ = @${room.game.playerX.split('@')[0]}
-⭕ = @${room.game.playerO.split('@')[0]}
+  if (!room) return !1
+  if (!m.quoted) return !0
+  if (!/^(🎮 \*Juego: Gato|Clasico juego de gato)/i.test(m.quoted.text)) return !0
 
-Turno de: ${room.game.currentTurn === 'x' ? '❌' : '⭕'}
-    
-${arr.slice(0, 3).map(v => v[1]).join(' | ')}
-${arr.slice(3, 6).map(v => v[1]).join(' | ')}
-${arr.slice(6).map(v => v[1]).join(' | ')}
-`.trim()
-
-    let msg = await conn.sendMessage(m.chat, { text: str, mentions: [room.game.playerX, room.game.playerO] }, { quoted: m })
-    room.msg = msg
-
-    // autodestruir sala a los 30 min
-    room.timeout = setTimeout(() => {
-      delete conn.game[room.id]
-      conn.sendMessage(m.chat, { text: '⏰ La partida de *TicTacToe* fue eliminada por inactividad.' })
-    }, 1800000)
-
-  } else {
-    // crea sala como X
-    let id = 'tictactoe-' + (+new Date)
-    let game = new TicTacToe(m.sender, 'o')
-    conn.game[id] = {
-      id,
-      x: m.chat,
-      o: '',
-      game,
-      state: 'WAITING',
-      name: text || '',
-      msg: null,
-      timeout: null
-    }
-    m.reply(`✅ Sala creada.\nEspera a un oponente para jugar.\n\nUsa: *${usedPrefix + command} ${text || ''}* para unirte.`)
-  }
-}
-
-handler.command = /^tictactoe|ttt$/i
-export default handler
-
-
-// Listener de jugadas
-export async function before(m, { conn }) {
-  conn.game = conn.game ? conn.game : {}
-  let room = Object.values(conn.game).find(r => r.state === 'PLAYING' && [r.game.playerX, r.game.playerO].includes(m.sender))
-
-  if (!room) return
-  let isNumber = /^[1-9]$/.test(m.text)
-  let isSalir = m.text?.toLowerCase() === 'salir'
-
-  // salir
-  if (isSalir) {
-    conn.sendMessage(m.chat, { text: `🚪 @${m.sender.split('@')[0]} salió de la partida.`, mentions: [m.sender] })
-    clearTimeout(room.timeout)
+  // Salir o rendirse
+  if (/^(salir|rendirse)$/i.test(m.text)) {
+    let loser = m.sender
+    let winner = room.game.playerX === loser ? room.game.playerO : room.game.playerX
+    let msg = `🏳️ @${loser.split('@')[0]} se rindió.\n🎉 ¡Ganador: @${winner.split('@')[0]}!`
+    await conn.sendMessage(room.x, { text: msg, mentions: conn.parseMention(msg) })
+    if (room.o && room.o !== room.x) await conn.sendMessage(room.o, { text: msg, mentions: conn.parseMention(msg) })
     delete conn.game[room.id]
+    clearTimeout(room.timeout)
     return !0
   }
 
-  if (!isNumber) return
-  let choice = m.text - 1
-  let player = room.game.playerX === m.sender ? 0 : 1
-  let status = room.game.turn(player, choice)
+  // Jugar número 1–9
+  let isNumber = /^[1-9]$/.test(m.text)
+  if (!isNumber) return !0
 
-  if (status < 1) return // movimiento inválido
-
-  let arr = room.game.render().map((v, i) => [i + 1, v])
-  let str = `
-🎮 *TicTacToe*
-
-❌ = @${room.game.playerX.split('@')[0]}
-⭕ = @${room.game.playerO.split('@')[0]}
-
-Turno de: ${room.game.currentTurn === 'x' ? '❌' : '⭕'}
-    
-${arr.slice(0, 3).map(v => v[1]).join(' | ')}
-${arr.slice(3, 6).map(v => v[1]).join(' | ')}
-${arr.slice(6).map(v => v[1]).join(' | ')}
-`.trim()
-
-  if (room.game.winner) {
-    str += `\n\n🏆 Ganador: ${room.game.winner === 'x' ? '❌' : '⭕'}`
-    clearTimeout(room.timeout)
-    delete conn.game[room.id]
-  } else if (room.game.turns >= 9) {
-    str += `\n\n🤝 Empate.`
-    clearTimeout(room.timeout)
-    delete conn.game[room.id]
+  let player = room.game.currentTurn === m.sender ? (room.game.playerX === m.sender ? 0 : 1) : -1
+  if (player === -1) {
+    await m.reply(`⏳ No es tu turno todavía!`)
+    return !0
   }
 
-  await conn.sendMessage(m.chat, { text: str, mentions: [room.game.playerX, room.game.playerO] }, { quoted: room.msg })
-  return !0
+  let index = parseInt(m.text) - 1
+  let result = room.game.turn(player, index)
+
+  if (result < 1) {
+    let msg = result === -1 ? '❌ Posición inválida'
+      : result === 0 ? '⚠️ Esa casilla ya está ocupada'
+      : result === -2 ? '🚫 No es tu turno'
+      : result === -3 ? '🏁 El juego ya terminó'
+      : 'Error desconocido'
+    await m.reply(msg)
+    return !0
+  }
+
+  let arr = room.game.render().map(v => ({
+    X: '❌', O: '⭕',
+    1: '1️⃣', 2: '2️⃣', 3: '3️⃣',
+    4: '4️⃣', 5: '5️⃣', 6: '6️⃣',
+    7: '7️⃣', 8: '8️⃣', 9: '9️⃣',
+  }[v]))
+
+  let str = `
+🎮 *Juego: Gato / 3 en raya*
+
+${arr.slice(0, 3).join('')}
+${arr.slice(3, 6).join('')}
+${arr.slice(6).join('')}
+
+${room.game.winner ? `🎉 ¡Ganador: @${room.game.winner.split('@')[0]}!` :
+room.game.board === 511 ? '🤝 ¡Empate!' :
+`👉 Es turno de @${room.game.currentTurn.split('@')[0]}`}
+`.trim()
+
+  let mentions = conn.parseMention(str)
+  await conn.sendMessage(room.x, { text: str, mentions })
+  if (room.o && room.o !== room.x) await conn.sendMessage(room.o, { text: str, mentions })
+
+  if (room.game.winner || room.game.board === 511) {
+    room.state = 'END'
+    delete conn.game[room.id]
+    clearTimeout(room.timeout)
+  }
 }
+
+export default handler
