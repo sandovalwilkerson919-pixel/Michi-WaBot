@@ -1,3 +1,4 @@
+// ••> # Hecho x Ado [ github.com/Ado-rgb ]
 import axios from 'axios'
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
