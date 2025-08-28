@@ -17,9 +17,24 @@ let crm3 = "SBpbmZvLWRvbmFyLmpz"
 let crm4 = "IF9hdXRvcmVzcG9uZGVyLmpzIGluZm8tYm90Lmpz"
 let drm1 = ""
 let drm2 = ""
-let rtx = `⟩ Escanea este codigo *QR* para vincular`.trim()
+let rtx = `
+⟩ Para vincular el bot con tu WhatsApp usa el método de *Código QR*  
 
-let rtx2 = `⟩ Escriba el *código de 8 dígitos* que se le brindará a continúacion:`.trim()
+» Paso 1: Abre tu WhatsApp en tu celular  
+» Paso 2: Ve a *Dispositivos vinculados*  
+» Paso 3: Toca en *Vincular un dispositivo*  
+» Paso 4: Escanea este *Código QR* que aparece aquí  
+`.trim()
+
+let rtx2 = `
+⟩ Vincula usando el *código de 8 dígitos*  
+
+» Paso 1: Abre tu WhatsApp en tu celular  
+» Paso 2: Ve a *Dispositivos vinculados*  
+» Paso 3: Toca en *Vincular un dispositivo*  
+» Paso 4: Selecciona la opción *¿Usar código de teléfono?*  
+» Paso 5: Ingresa el *código de 8 dígitos* que se mostrará a continuación
+`.trim()
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
