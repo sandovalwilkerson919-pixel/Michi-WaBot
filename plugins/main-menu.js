@@ -34,7 +34,7 @@ const defaultMenu = {
   header: '> *_%category_*\n',
   body: '🌾 •⟩ *%cmd* %islimit %isPremium',
   footer: '> 🌿 Creador › Ado
-> ✨ Colaborador › GianPoolS',
+> ✨ Colaborador › GianPool',
   after: ``
 }
 
