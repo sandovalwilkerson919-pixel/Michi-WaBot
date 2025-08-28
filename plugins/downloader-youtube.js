@@ -1,19 +1,19 @@
-//--> Hecho por Ado-rgb (github.com/Ado-rgb)
-// •|• No quites créditos..
 import fetch from 'node-fetch'
 import yts from 'yt-search'
 import fs from 'fs'
 import path from 'path'
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
-  if (!args[0]) return m.reply(`
+  if (!args[0]) return m.reply({
+    text: `
 ⟩ ⚠️ *Uso correcto del comando:*  
 » ${usedPrefix + command} <enlace o nombre de canción/video>  
 
 ✦ Ejemplos:  
 • ${usedPrefix + command} https://youtu.be/abcd1234  
 • ${usedPrefix + command} nombre de la canción
-`)
+`, ...global.rcanal
+  })
 
   try {
     await m.react('🕓')
@@ -33,7 +33,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
     if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
       let search = await yts(args.join(' '))
-      if (!search.videos?.length) return m.reply('⚠️ No se encontraron resultados en YouTube.')
+      if (!search.videos?.length) return m.reply({ text: '⚠️ No se encontraron resultados en YouTube.', ...global.rcanal })
       videoInfo = search.videos[0]
       url = videoInfo.url
     } else {
@@ -42,7 +42,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       if (search?.title) videoInfo = search
     }
 
-    if (videoInfo.seconds > 3780) return m.reply('⛔ El video supera el límite permitido de *63 minutos*.')
+    if (videoInfo.seconds > 3780) return m.reply({ text: '⛔ El video supera el límite permitido de *63 minutos*.', ...global.rcanal })
 
     let apiUrl = ''
     let isAudio = false
@@ -51,7 +51,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       isAudio = true
     } else if (command == 'play2' || command == 'ytmp4') {
       apiUrl = `https://myapiadonix.vercel.app/api/ytmp4?url=${encodeURIComponent(url)}`
-    } else return m.reply('❌ Comando no reconocido.')
+    } else return m.reply({ text: '❌ Comando no reconocido.', ...global.rcanal })
 
     let res = await fetch(apiUrl)
     if (!res.ok) throw new Error('Error al conectar con la API.')
@@ -59,17 +59,6 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     if (!json.success) throw new Error('No se pudo obtener información del video.')
 
     let { title, thumbnail, download, quality } = json.data
-
-    let fkontak = {
-      key: { fromMe: false, participant: "0@s.whatsapp.net", remoteJid: "status@broadcast" },
-      message: {
-        contactMessage: {
-          displayName: nombreBot,
-          vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;Bot;;;\nFN:${nombreBot}\nTEL;type=CELL;type=VOICE;waid=50493732693:+504 93732693\nEND:VCARD`,
-          jpegThumbnail: null
-        }
-      }
-    }
 
     let dur = videoInfo.seconds || 0
     let h = Math.floor(dur / 3600)
@@ -81,22 +70,21 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     let ago = videoInfo.ago || "N/D"
     let author = videoInfo.author?.name || "Desconocido"
 
-    let caption = `
-⟩ ✦ *Información del video* ✦
+    let caption = `⟩ ✦ *Información del video* ✦
 
 » 🎬 *Título:* ${title}  
 » ⏱️ *Duración:* ${duration}  
 » 👤 *Canal:* ${author}  
 » 👁️ *Vistas:* ${views}  
 » 📅 *Publicado:* ${ago}  
-» 📌 *Calidad:* ${quality || "Auto"}
-`
+» 📌 *Calidad:* ${quality || "Auto"}`
 
     await conn.sendMessage(m.chat, {
       image: { url: thumbnail },
       caption,
-      contextInfo: { mentionedJid: [m.sender] }
-    }, { quoted: fkontak })
+      contextInfo: { mentionedJid: [m.sender] },
+      ...global.rcanal
+    })
 
     if (isAudio) {
       await conn.sendMessage(m.chat, {
@@ -104,23 +92,26 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         mimetype: 'audio/mpeg',
         fileName: `${title}.mp3`,
         ptt: true
-      }, { quoted: fkontak })
+      })
     } else {
       await conn.sendMessage(m.chat, {
         video: { url: download },
         mimetype: 'video/mp4',
-        fileName: `${title}.mp4`
-      }, { quoted: fkontak })
+        fileName: `${title}.mp4`,
+        ...global.rcanal
+      })
     }
 
     await m.react('✅')
   } catch (e) {
     console.error(e)
     await m.react('❌')
-    m.reply(`
+    m.reply({
+      text: `
 ⟩ ❌ *Ocurrió un error procesando tu solicitud*  
 » Verifica que el enlace sea válido o inténtalo más tarde.
-`)
+`, ...global.rcanal
+    })
   }
 }
 
