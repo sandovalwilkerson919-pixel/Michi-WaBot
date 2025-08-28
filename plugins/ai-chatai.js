@@ -1,91 +1,102 @@
-/**
- * Creado por Ado-rgb
- * Repo: github.com/Ado-rgb
- * No quitar créditos
- */
-
 import axios from 'axios'
 
-const MODELOS = {
-  'ChatGPT-4o': 'chatgpt-4o',
-  'ChatGPT-4o Mini': 'chatgpt-4o-mini',
-  'Claude 3 Opus': 'claude-3-opus',
-  'Claude 3.5 Sonnet': 'claude-3-sonnet',
-  'Llama 3': 'llama-3',
-  'Llama 3.1 (Pro)': 'llama-3-pro',
-  'Perplexity AI': 'perplexity-ai',
-  'Mistral Large': 'mistral-large',
-  'Gemini 1.5 Pro': 'gemini-1.5-pro'
-}
+let handler = async (m, { conn, text, usedPrefix, command }) => {
 
-async function consultarIA(pregunta, modeloElegido) {
-  const modelo = MODELOS[modeloElegido]
-  if (!modelo) return `❌ El modelo "${modeloElegido}" no está disponible.`
+  const artly = {
+    api: {
+      base: 'https://getimg-x4mrsuupda-uc.a.run.app',
+      endpoint: {
+        generate: '/api-premium',
+      }
+    },
+    headers: {
+      'user-agent': 'NB Android/1.0.0',
+      'accept-encoding': 'gzip',
+      'content-type': 'application/x-www-form-urlencoded'
+    },
 
-  try {
-    const { data } = await axios.post(
-      'https://whatsthebigdata.com/api/ask-ai/',
-      {
-        message: pregunta,
-        model: modelo,
-        history: []
-      },
-      {
-        headers: {
-          'content-type': 'application/json',
-          'origin': 'https://whatsthebigdata.com',
-          'referer': 'https://whatsthebigdata.com/ai-chat/',
-          'user-agent': 'Mozilla/5.0'
+    generate: async (prompt = '', width = 512, height = 512, steps = 25) => {
+      if (!prompt.trim()) {
+        return {
+          success: false,
+          code: 400,
+          result: {
+            error: '⚠️ El prompt no puede estar vacío.'
+          }
         }
       }
-    )
+      try {
+        const payload = new URLSearchParams()
+        payload.append('prompt', prompt)
+        payload.append('width', width.toString())
+        payload.append('height', height.toString())
+        payload.append('num_inference_steps', steps.toString())
 
-    if (data?.text) {
-      return `🔰 Modelo: ${modeloElegido}\n🎋 Pregunta: ${pregunta}\n\n${data.text}`
+        const response = await axios.post(`${artly.api.base}${artly.api.endpoint.generate}`, payload, {
+          headers: artly.headers
+        })
+        const data = response.data
+        return {
+          success: true,
+          code: 200,
+          result: {
+            seed: data.seed,
+            cost: data.cost,
+            url: data.url
+          }
+        }
+      } catch (err) {
+        return {
+          success: false,
+          code: err.response?.status || 500,
+          result: {
+            error: '✘ Ocurrió un error durante la generación.'
+          }
+        }
+      }
+    },
+  }
+
+  if (command === 'artly') {
+    if (!text) {
+      return conn.sendMessage(
+        m.chat,
+        { text: `⟩ *Uso correcto:*\n» ${usedPrefix + command} <prompt>\n\n> Ejemplo:\n» ${usedPrefix + command} un gato con sombrero`, ...global.rcanal },
+        { quoted: m }
+      )
     }
 
-    return '⚠️ No se obtuvo respuesta de la IA.'
-  } catch (e) {
-    return `⚠️ Error: ${
-      e.response?.status === 400
-        ? 'El texto fue rechazado por el modelo.'
-        : e.message
-    }`
-  }
-}
-
-let handler = async (m, { args, text }) => {
-  if (!text) {
-    return m.reply(
-`Uso: .chatai [modelo opcional] [pregunta]
-
-Ejemplo 1:
-.chatai ¿Qué es la inteligencia artificial?
-
-Ejemplo 2:
-.chatai ChatGPT-4o Explica la teoría de cuerdas
-
-Modelos disponibles:
-${Object.keys(MODELOS).join(', ')}`
+    await conn.sendMessage(
+      m.chat,
+      { text: `🕒 Generando tu imagen...\n⟩ Por favor espera un momento.`, ...global.rcanal },
+      { quoted: m }
     )
+
+    const result = await artly.generate(text)
+
+    if (result.success) {
+      await conn.sendMessage(
+        m.chat,
+        {
+          image: { url: result.result.url },
+          caption: `⟩ *Imagen generada con Artly* ✅\n\n» *Seed:* ${result.result.seed}\n» *Cost:* ${result.result.cost}`,
+          ...global.rcanal
+        },
+        { quoted: m }
+      )
+    } else {
+      await conn.sendMessage(
+        m.chat,
+        { text: `✘ Error: ${result.result.error}\n⟩ (Código: ${result.code})`, ...global.rcanal },
+        { quoted: m }
+      )
+    }
   }
-
-  let modeloElegido = 'Claude 3.5 Sonnet'
-  let pregunta = text
-
-  const primeraPalabra = args[0]
-  if (MODELOS[primeraPalabra]) {
-    modeloElegido = primeraPalabra
-    pregunta = args.slice(1).join(' ')
-    if (!pregunta) return m.reply('⚠️ Debes escribir una pregunta después del modelo.')
-  }
-
-  const respuesta = await consultarIA(pregunta, modeloElegido)
-  m.reply(respuesta)
 }
 
-handler.help = ['chatai']
+handler.help = ['artly']
+handler.command = ['artly']
 handler.tags = ['ia']
-handler.command = ['chatai']
+
 
 export default handler
