@@ -7,6 +7,7 @@ let handler = async (m, { conn, command }) => {
     const randomkpop = body.split('\n').filter(v => v && v.startsWith('http'))
     const randomkpopx = randomkpop[Math.floor(Math.random() * randomkpop.length)]
 
+    // frases dinámicas
     const frases = [
       "✨ Disfruta de BlackPink en acción 💖",
       "🌸 Una imagen más de BlackPink 💟",
@@ -21,7 +22,7 @@ let handler = async (m, { conn, command }) => {
     await conn.sendButton(
       m.chat,
       frase,
-      wm, // tu watermark
+      namebot, // aquí sigue tu variable namebot
       randomkpopx,
       [['🔄 SIGUIENTE 🔄', `/${command}`]],
       m
