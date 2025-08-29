@@ -48,7 +48,7 @@ await conn.sendButton(
   frase,  
   namebot, // tu watermark o nombre del bot  
   randomkpopx,  
-  [[estilo, `/${command}`]], // Botón dinámico  
+  //[[estilo, `${usedprefix + command}`]], // Botón dinámico  
   m  
 )
 
