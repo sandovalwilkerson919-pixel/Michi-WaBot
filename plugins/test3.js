@@ -1,6 +1,7 @@
-import { generateWAMessageContent } from '@whiskeysockets/baileys'
+import fetch from 'node-fetch'
+import fs from 'fs'
 
-let handler = async (m, { conn, command }) => {
+let handler = async (m, { conn, command, usedPrefix }) => {
   try {
     const res = await fetch('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/kpop/blackpink.txt')
     const body = await res.text()
@@ -18,74 +19,63 @@ let handler = async (m, { conn, command }) => {
     const frase = frases[Math.floor(Math.random() * frases.length)]
 
     const estilos = [
-      "💕 SIGUIENTE 💕", "💞 SIGUIENTE 💞", "🩷 SIGUIENTE 🩷",
-      "💌 SIGUIENTE 💌", "🧡 SIGUIENTE 🧡", "❤️ SIGUIENTE ❤️",
-      "💛 SIGUIENTE 💛", "💚 SIGUIENTE 💚", "🩵 SIGUIENTE 🩵",
-      "💙 SIGUIENTE 💙", "💜 SIGUIENTE 💜", "🤍 SIGUIENTE 🤍",
+      "💕 SIGUIENTE 💕", "💞 SIGUIENTE 💞", "🩷 SIGUIENTE 🩷", "💌 SIGUIENTE 💌",
+      "🧡 SIGUIENTE 🧡", "❤️ SIGUIENTE ❤️", "💛 SIGUIENTE 💛", "💚 SIGUIENTE 💚",
+      "🩵 SIGUIENTE 🩵", "💙 SIGUIENTE 💙", "💜 SIGUIENTE 💜", "🤍 SIGUIENTE 🤍",
       "❤️‍🔥 SIGUIENTE ❤️‍🔥", "❣️ SIGUIENTE ❣️", "💓 SIGUIENTE 💓",
       "💗 SIGUIENTE 💗", "💝 SIGUIENTE 💝", "💖 SIGUIENTE 💖"
     ]
     const estilo = estilos[Math.floor(Math.random() * estilos.length)]
 
-    // Generamos la imagen en formato imageMessage
-    const mediaMsg = await generateWAMessageContent(
-      { image: { url: randomkpopx } },
-      { upload: conn.waUploadToServer }
-    )
-
     const gp = {
-      key: { fromMe: false, participant: `0@s.whatsapp.net` },
-      message: {
-        productMessage: {
-          product: {
-            productImage: { mimetype: 'image/jpeg', jpegThumbnail: require('fs').readFileSync('./storage/img/menu2.jpg') },
-            title: `BlackPink`,
-            description: 'by GP',
-            currencyCode: 'USD',
-            priceAmount1000: '1000000000',
-            retailerId: 'Ghost',
-            productImageCount: 1
+      key:{fromMe:false,participant:`0@s.whatsapp.net`},
+      message:{
+        productMessage:{
+          product:{
+            productImage:{
+              mimetype:'image/jpeg',
+              jpegThumbnail: fs.readFileSync('./storage/img/menu2.jpg')
+            },
+            title:`BlackPink`,
+            description:'by GP',
+            currencyCode:'USD',
+            priceAmount1000:'1000000000',
+            retailerId:'Ghost',
+            productImageCount:1
           },
-          businessOwnerJid: `0@s.whatsapp.net`
+          businessOwnerJid:`0@s.whatsapp.net`
         }
       }
     }
 
+    conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key } })
+
     await conn.sendMessage(
       m.chat,
       {
-        viewOnceMessage: {
-          message: {
-            interactiveMessage: {
-              body: { text: frase },
-              footer: { text: 'byGP Bot' },
-              header: { hasMediaAttachment: true, imageMessage: mediaMsg.imageMessage },
-              nativeFlowMessage: {
-                buttons: [
-                  {
-                    name: 'quick_reply',
-                    buttonParamsJson: JSON.stringify({
-                      display_text: estilo,
-                      id: `/${command}`
-                    })
-                  }
-                ]
-              }
-            }
+        image: { url: randomkpopx },
+        caption: frase,
+        footer: 'BlackPink byGP',
+        buttons: [
+          {
+            buttonId: `${usedPrefix + command}`,
+            buttonText: { displayText: estilo },
+            type: 1
           }
-        }
+        ],
+        headerType: 4
       },
       { quoted: gp }
     )
 
   } catch (e) {
-    console.error(e)
     m.reply('❌ Hubo un error al cargar la imagen.')
+    console.error(e)
   }
 }
 
 handler.help = ['blackpink']
 handler.tags = ['kpop']
-handler.command = ['blackpink']
+handler.command = ['blackpink','t3']
 
 export default handler
