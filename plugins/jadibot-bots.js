@@ -44,10 +44,10 @@ let handler = async (m, { conn, command, usedPrefix }) => {
 
         listado.push(
 `• ✦ 「 ${i + 1} 」
-⟩ *👤 Usuario:* ${v.user.name || 'Sub-Bot'}
-⟩ *💎 Número:* wa.me/${jid}
-⟩ *⚙️ Prefijo:* ${Array.isArray(prefix) ? prefix.join(', ') : prefix}
-⟩ *🕑 Activo:* ${v.uptime ? msToTime(Date.now() - v.uptime) : 'Desconocido'}`
+*👤 Usuario:* ${v.user.name || 'Sub-Bot'}
+*🧃 Número:* wa.me/${jid}
+*⚙️ Prefijo:* ${Array.isArray(prefix) ? prefix.join(', ') : prefix}
+*🕑 Activo:* ${v.uptime ? msToTime(Date.now() - v.uptime) : 'Desconocido'}`
         )
       }
 
@@ -57,7 +57,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
 
       let responseMessage = `
 ✦ *LISTA DE SUBBOTS ACTIVOS* ✦
-» 📌 *Total:* ${users.length || '0'}
+» 🦀 *Total:* ${users.length || '0'}
 
 ${replyMessage.trim()}
 `
