@@ -1,3 +1,6 @@
+//[##] Creado por GianPoolS
+//[##] No quites los créditos
+
 import fetch from 'node-fetch'
 
 let handler = async (m, { conn, command }) => {
