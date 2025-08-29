@@ -3,7 +3,6 @@ import yts from 'yt-search'
 import fs from 'fs'
 import path from 'path'
 
-/* =================== PLAY AUDIO (MP3) =================== */
 let handler = async (m, { conn, args, command, usedPrefix }) => {
   if (!args[0]) return m.reply({
     text: `
@@ -67,65 +66,8 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
   }
 }
 
-/* =================== PLAY2 VIDEO (MP4) =================== */
-let handler2 = async (m, { conn, args, command, usedPrefix }) => {
-  if (!args[0]) return m.reply({
-    text: `
-⟩ ⚠️ *Uso correcto del comando:*  
-» ${usedPrefix + command} <enlace o nombre de video>  
-
-✦ Ejemplos:  
-• ${usedPrefix + command} https://youtu.be/abcd1234  
-• ${usedPrefix + command} nombre del video
-    `.trim(),
-    ...global.rcanal
-  })
-
-  try {
-    await m.react('🕓')
-
-    let url = args[0]
-    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
-      const search = await yts(args.join(' '))
-      if (!search.videos?.length) return m.reply({ text: '⚠️ No se encontraron resultados en YouTube.', ...global.rcanal })
-      url = search.videos[0].url
-    }
-
-    const apiUrl = `https://myapiadonix.vercel.app/download/ytdl?play=${encodeURIComponent(url)}`
-    const res = await fetch(apiUrl)
-    if (!res.ok) throw new Error('Error al conectar con la API.')
-    const json = await res.json()
-    if (!json.status) throw new Error('No se pudo obtener información del video.')
-
-    const { title, mp4 } = json.result
-
-    await conn.sendMessage(m.chat, {
-      video: { url: mp4 },
-      mimetype: 'video/mp4',
-      fileName: title.endsWith('.mp4') ? title : `${title}.mp4`,
-      caption: `🎬 ${title}`
-    })
-
-    await m.react('✅')
-  } catch (error) {
-    console.error('Error en comando play2:', error)
-    await m.react('❌')
-    m.reply({
-      text: `
-⟩ ❌ *Ocurrió un error procesando tu solicitud*  
-» Verifica que el enlace o nombre sea válido o inténtalo más tarde.
-    `.trim(),
-    ...global.rcanal
-    })
-  }
-}
-
 handler.help = ['play', 'ytmp3']
 handler.tags = ['downloader']
 handler.command = ['play', 'ytmp3']
 
-handler2.help = ['play2']
-handler2.tags = ['downloader']
-handler2.command = ['play2']
-
-export default [handler, handler2]
+export default handler
