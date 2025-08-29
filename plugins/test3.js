@@ -53,19 +53,22 @@ let handler = async (m, { conn, command }) => {
     await conn.sendMessage(
   m.chat,
   {
-    image: { url: randomkpopx },
-    caption: frase,
-    footer: namebot,
-    templateMessage: {
-      hydratedTemplate: {
-        hydratedContentText: frase,
-        hydratedFooterText: namebot,
-        hydratedButtons: [
+    interactiveMessage: {
+      body: { text: frase },
+      footer: { text: namebot },
+      header: {
+        title: 'BlackPink 💖',
+        hasMediaAttachment: true,
+        imageMessage: { url: randomkpopx } // 👈 la imagen
+      },
+      nativeFlowMessage: {
+        buttons: [
           {
-            quickReplyButton: {
-              displayText: estilo,
+            name: 'quick_reply',
+            buttonParamsJson: JSON.stringify({
+              display_text: estilo,
               id: `/${command}`
-            }
+            })
           }
         ]
       }
