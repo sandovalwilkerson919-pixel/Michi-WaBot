@@ -14,9 +14,8 @@ let handler = async (m, { text }) => {
 
   if (!text) 
     return m.reply(`${emojip} Proporciona un prefijo o lista de prefijos.\n
-> Ejemplo: #setprefix !
-> También puedes poner varios: #setprefix 🍉
-> O poner *multi* para activar varios prefijos.`)
+> Ejemplo: #setprefix 🦀
+> O poner #setprefix multi`)
 
   
   let config = {}
