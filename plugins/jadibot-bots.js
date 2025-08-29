@@ -3,91 +3,13 @@ const fs = { ...fsPromises, existsSync }
 import path from 'path'
 import ws from 'ws'
 
-let handler = async (m, { conn, command, usedPrefix, args, text, isOwner }) => {
+let handler = async (m, { conn, command, usedPrefix }) => {
   const isCommandDelete = /^(deletesesion|deletebot|deletesession|deletesesaion)$/i.test(command)
   const isCommandStop = /^(stop|pausarai|pausarbot)$/i.test(command)
   const isCommandList = /^(bots|sockets|socket)$/i.test(command)
 
-  async function reportError(e) {
-    await conn.sendMessage(m.chat, { text: `⟩ ❌ *Ocurrió un error inesperado*  
-» Contacta con el creador para resolverlo.`, ...global.rcanal }, { quoted: m })
-    console.error(e)
-  }
-
   switch (true) {
-    case isCommandDelete: {
-      let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender
-      let uniqid = `${who.split`@`[0]}`
-      const sessionPath = path.join(process.cwd(), `${jadi}`, uniqid)
-
-      if (!fs.existsSync(sessionPath)) {
-        await conn.sendMessage(
-          m.chat,
-          {
-            text: `
-⟩ ⚠️ *No tienes sesión activa.*  
-
-✦ Puedes crear una nueva sesión con:  
-• ${usedPrefix + command}  
-
-✦ O usar tu ID para saltarte este paso:  
-• ${usedPrefix + command} \`${uniqid}\`
-`,
-            ...global.rcanal
-          },
-          { quoted: m }
-        )
-        return
-      }
-
-      if (global.conn.user.jid !== conn.user.jid) {
-        return conn.sendMessage(
-          m.chat,
-          {
-            text: `
-⟩ ⚠️ Este comando debe ejecutarse desde el *Bot Principal*.  
-
-✦ Contacta al principal aquí:  
-• [Clic para enviar mensaje](https://api.whatsapp.com/send/?phone=${global.conn.user.jid.split`@`[0]}&text=${usedPrefix + command}&type=phone_number&app_absent=0)
-`,
-            ...global.rcanal
-          },
-          { quoted: m }
-        )
-      }
-
-      try {
-        await fs.rm(sessionPath, { recursive: true, force: true })
-        await conn.sendMessage(
-          m.chat,
-          { text: `⟩ ✅ *Tu sesión como Sub-Bot fue eliminada correctamente.*  
-✦ Todo rastro ha sido borrado exitosamente.`, ...global.rcanal },
-          { quoted: m }
-        )
-      } catch (e) {
-        reportError(e)
-      }
-    } break
-
-    case isCommandStop: {
-      if (global.conn.user.jid === conn.user.jid) {
-        await conn.sendMessage(
-          m.chat,
-          { text: `⟩ ⚠️ *No eres un Sub-Bot activo.*  
-✦ Contacta al número principal si deseas activarte.`, ...global.rcanal },
-          { quoted: m }
-        )
-      } else {
-        await conn.sendMessage(
-          m.chat,
-          { text: `⟩ 🛑 *${botname || 'Sub-Bot'} se pausó correctamente.*  
-✦ Se cerró la conexión de este Sub-Bot.`, ...global.rcanal },
-          { quoted: m }
-        )
-        conn.ws.close()
-      }
-    } break
-
+    // ✦ LISTA DE SUBBOTS ✦
     case isCommandList: {
       const users = [...new Set([...global.conns.filter(c => c.user && c.ws.socket && c.ws.socket.readyState !== ws.CLOSED)])]
 
@@ -99,29 +21,50 @@ let handler = async (m, { conn, command, usedPrefix, args, text, isOwner }) => {
         segundos %= 60
         minutos %= 60
         horas %= 24
-        return `${dias ? dias + " días, " : ""}${horas ? horas + " horas, " : ""}${minutos ? minutos + " minutos, " : ""}${segundos ? segundos + " segundos" : ""}`
+        return `${dias ? dias + "d " : ""}${horas ? horas + "h " : ""}${minutos ? minutos + "m " : ""}${segundos ? segundos + "s" : ""}`
       }
 
-      const message = users
-        .map((v, i) => `
-• ✦ 「 ${i + 1} 」  
-⟩ 🧃 Usuario: ${v.user.name || 'Sub-Bot'}  
-⟩ 💎 Enlace: https://wa.me/${v.user.jid.replace(/[^0-9]/g, '')}?text=${usedPrefix}speed  
-⟩ 🕑 Activo por: ${v.uptime ? msToTime(Date.now() - v.uptime) : 'Desconocido'}
-        `.trim())
-        .join('\n\n')
+      let listado = []
+      for (let [i, v] of users.entries()) {
+        let jid = v.user.jid.replace(/[^0-9]/g, '')
+        let botPath = path.join('./JadiBots', jid)
+        let configPath = path.join(botPath, 'config.json')
 
-      const replyMessage = message.length ? message : `⟩ ❌ *No hay Sub-Bots disponibles en este momento.*`
+        // prefijo por defecto
+        let prefix = global.prefix ? global.prefix : '.'
 
-      const responseMessage = `
-✦ *LISTA DE SUBBOTS ACTIVOS*  ✦ 
-» 📌 *Total Subbots:* ${users.length || '0'}  
+        if (fs.existsSync(configPath)) {
+          try {
+            let config = JSON.parse(await fs.readFile(configPath, 'utf8'))
+            prefix = config.prefix || prefix
+          } catch (e) {
+            prefix = global.prefix || '.'
+          }
+        }
+
+        listado.push(
+`• ✦ 「 ${i + 1} 」
+⟩ 👤 Usuario: ${v.user.name || 'Sub-Bot'}
+⟩ 💎 Número: wa.me/${jid}
+⟩ ⚙️ Prefijo: ${Array.isArray(prefix) ? prefix.join(', ') : prefix}
+⟩ 🕑 Activo: ${v.uptime ? msToTime(Date.now() - v.uptime) : 'Desconocido'}`
+        )
+      }
+
+      let replyMessage = listado.length 
+        ? listado.join('\n\n') 
+        : `⟩ ❌ *No hay Sub-Bots disponibles en este momento.*`
+
+      let responseMessage = `
+✦ *LISTA DE SUBBOTS ACTIVOS* ✦
+» 📌 *Total:* ${users.length || '0'}
 
 ${replyMessage.trim()}
 `
 
       await conn.sendMessage(m.chat, { text: responseMessage, mentions: conn.parseMention(responseMessage), ...global.rcanal }, { quoted: m })
-    } break
+    }
+    break
   }
 }
 
