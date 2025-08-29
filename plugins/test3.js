@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 import fs from 'fs'
 
-let handler = async (m, { conn, command, usedPrefix }) => {
+let handler = async (m, { conn, command }) => {
   try {
     const res = await fetch('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/kpop/blackpink.txt')
     const body = await res.text()
@@ -51,20 +51,31 @@ let handler = async (m, { conn, command, usedPrefix }) => {
     conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key } })
 
     await conn.sendMessage(
-      m.chat,
-      {
-        image: { url: randomkpopx },
-        caption: frase,
-        footer: 'BlackPink byGP',
-        buttons: [
-          { buttonId: `${usedPrefix + command}`, buttonText: { displayText: estilo }, type: 1 }
+  m.chat,
+  {
+    image: { url: randomkpopx },
+    caption: frase,
+    footer: namebot,
+    templateMessage: {
+      hydratedTemplate: {
+        hydratedContentText: frase,
+        hydratedFooterText: namebot,
+        hydratedButtons: [
+          {
+            quickReplyButton: {
+              displayText: estilo,
+              id: `/${command}`
+            }
+          }
         ]
-      },
-      { quoted: gp }
-    )
+      }
+    }
+  },
+  { quoted: gp }
+)
 
   } catch (e) {
-    m.reply(`❌ Error: ${e.message}`)
+    m.reply('❌ Hubo un error al cargar la imagen.')
     console.error(e)
   }
 }
