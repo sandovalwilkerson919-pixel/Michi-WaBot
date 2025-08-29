@@ -56,9 +56,20 @@ let handler = async (m, { conn, command }) => {
     image: { url: randomkpopx },
     caption: frase,
     footer: namebot,
-    templateButtons: [
-      { index: 1, quickReplyButton: { displayText: estilo, id: `/${command}` } }
-    ]
+    templateMessage: {
+      hydratedTemplate: {
+        hydratedContentText: frase,
+        hydratedFooterText: namebot,
+        hydratedButtons: [
+          {
+            quickReplyButton: {
+              displayText: estilo,
+              id: `/${command}`
+            }
+          }
+        ]
+      }
+    }
   },
   { quoted: gp }
 )
