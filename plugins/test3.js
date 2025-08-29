@@ -50,7 +50,7 @@ const fproducto = {key:{fromMe:false,participant:`0@s.whatsapp.net`},message:{pr
       namebot, // tu watermark o nombre del bot
       randomkpopx,
       [[estilo, `/${command}`]], // Botón dinámico
-      fproducto
+      m
     )
   } catch (e) {
     m.reply('❌ Hubo un error al cargar la imagen.')
