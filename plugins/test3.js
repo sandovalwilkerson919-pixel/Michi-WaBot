@@ -51,7 +51,7 @@ await conn.sendButton(
   namebot, // tu watermark o nombre del bot  
   randomkpopx,  
   [[estilo, `/${command}`]], // Botón dinámico  
-  gp  
+  m  
 )
 
 } catch (e) {
