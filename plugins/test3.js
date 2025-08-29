@@ -51,18 +51,18 @@ let handler = async (m, { conn, command }) => {
     conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key } })
 
     await conn.sendMessage(
-      m.chat,
-      {
-        image: { url: randomkpopx }, // ✅ ahora sí soportado
-        caption: frase,
-        footer: namebot,
-        buttons: [
-          { buttonId: `/${command}`, buttonText: { displayText: estilo }, type: 1 }
-        ],
-        headerType: 4
-      },
-      { quoted: gp }
-    )
+  m.chat,
+  {
+    image: { url: randomkpopx },
+    caption: frase,
+    footer: namebot,
+    templateButtons: [
+      { index: 1, quickReplyButton: { displayText: estilo, id: `/${command}` } }
+    ]
+  },
+  { quoted: gp }
+)
+
   } catch (e) {
     m.reply('❌ Hubo un error al cargar la imagen.')
     console.error(e)
@@ -71,6 +71,6 @@ let handler = async (m, { conn, command }) => {
 
 handler.help = ['blackpink']
 handler.tags = ['kpop']
-handler.command = ['blackpink']
+handler.command = ['blackpink','t3']
 
 export default handler
