@@ -31,66 +31,40 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       } catch {}
     }
 
-    // URL de tu nueva API
-    const apiUrl = `https://myapiadonix.vercel.app/download/ytdl?play=${encodeURIComponent(args.join(' '))}`
+    // URL nueva de la API
+    const apiUrl = `https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(args[0])}`
     const res = await fetch(apiUrl)
     if (!res.ok) throw new Error('Error al conectar con la API.')
     const json = await res.json()
     if (!json.status) throw new Error('No se pudo obtener información del video.')
 
-    const { title, thumbnail, duration, views, ago, author, mp3, mp4 } = json.result
+    const { filename, downloadUrl, format } = json
 
-    const caption = `⟩ ✦ *Información del video* ✦
-
-» 🎬 *Título:* ${title}  
-» ⏱️ *Duración:* ${duration}  
-» 👤 *Canal:* ${author}  
-» 👁️ *Vistas:* ${views.toLocaleString()}  
-» 📅 *Publicado:* ${ago}
-`
-
+    // Mandamos solo audio
     await conn.sendMessage(m.chat, {
-      image: { url: thumbnail },
-      caption,
-      contextInfo: { mentionedJid: [m.sender] },
-      ...global.rcanal
+      audio: { url: downloadUrl },
+      mimetype: 'audio/mpeg',
+      fileName: filename.endsWith('.mp3') ? filename : `${filename}.mp3`,
+      ptt: true
     })
-
-    if (command === 'play' || command === 'ytmp3') {
-      await conn.sendMessage(m.chat, {
-        audio: { url: mp3 },
-        mimetype: 'audio/mpeg',
-        fileName: `${title}.mp3`,
-        ptt: true
-      })
-    } else if (command === 'play2' || command === 'ytmp4') {
-      await conn.sendMessage(m.chat, {
-        video: { url: mp4 },
-        mimetype: 'video/mp4',
-        fileName: `${title}.mp4`,
-        ...global.rcanal
-      })
-    } else {
-      return m.reply({ text: '❌ Comando no reconocido.', ...global.rcanal })
-    }
 
     await m.react('✅')
 
   } catch (error) {
-    console.error('Error en comando play/ytmp3/ytmp4:', error)
+    console.error('Error en comando ytmp3:', error)
     await m.react('❌')
     m.reply({
       text: `
 ⟩ ❌ *Ocurrió un error procesando tu solicitud*  
-» Verifica que el enlace o nombre sea válido o inténtalo más tarde.
+» Verifica que el enlace sea válido o inténtalo más tarde.
       `.trim(),
       ...global.rcanal
     })
   }
 }
 
-handler.help = ['play', 'ytmp3', 'play2']
+handler.help = ['play', 'ytmp3']
 handler.tags = ['downloader']
-handler.command = ['play', 'play2', 'ytmp3', 'ytmp4']
+handler.command = ['play', 'ytmp3']
 
 export default handler
