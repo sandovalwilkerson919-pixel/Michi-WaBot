@@ -95,6 +95,30 @@ export async function handler(chatUpdate) {
         m = smsg(this, m) || m
         if (!m) return
 
+        
+        let prefixRegex = global.prefix 
+        try {
+          const senderNumber = this.user.jid.split('@')[0]
+          const botPath = path.join('./JadiBots', senderNumber)
+          const configPath = path.join(botPath, 'config.json')
+
+          if (fs.existsSync(configPath)) {
+            const config = JSON.parse(fs.readFileSync(configPath))
+            if (config.prefix) {
+              if (config.prefix === 'multi') {
+                prefixRegex = new RegExp('^[#$@*&?,;:+×!_\\-¿.]')
+              } else {
+                let safe = [...config.prefix].map(c =>
+                  c.replace(/([.*+?^${}()|\[\]\\])/g, '\\$1')
+                )
+                prefixRegex = new RegExp('^(' + safe.join('|') + ')')
+              }
+            }
+          }
+        } catch (e) {
+          console.error('❌ Error cargando prefijo del subbot:', e)
+        }
+
         m.exp = 0
         m.coin = 0 // Inicializar siempre en 0, se asignará valor solo si un plugin lo requiere.
 
@@ -188,7 +212,7 @@ export async function handler(chatUpdate) {
             if (!opts['restrict'] && plugin.tags && plugin.tags.includes('admin')) continue
 
             const str2Regex = str => str.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
-            let _prefix = plugin.customPrefix ? plugin.customPrefix : this.prefix ? this.prefix : global.prefix
+            let _prefix = plugin.customPrefix ? plugin.customPrefix : this.prefix ? this.prefix : prefixRegex
             let match = (_prefix instanceof RegExp ? [[_prefix.exec(m.text), _prefix]] :
                 Array.isArray(_prefix) ? _prefix.map(p => {
                     let re = p instanceof RegExp ? p : new RegExp(str2Regex(p))
