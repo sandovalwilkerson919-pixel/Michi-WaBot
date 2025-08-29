@@ -1,14 +1,16 @@
 import fetch from 'node-fetch'
 import fs from 'fs'
-import { proto } from '@whiskeysockets/baileys'
+import { proto, generateWAMessageContent } from '@whiskeysockets/baileys'
 
 let handler = async (m, { conn, command }) => {
   try {
+    // Obtenemos imágenes aleatorias de BlackPink
     const res = await fetch('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/kpop/blackpink.txt')
     const body = await res.text()
     const randomkpop = body.split('\n').filter(v => v && v.startsWith('http'))
     const randomkpopx = randomkpop[Math.floor(Math.random() * randomkpop.length)]
 
+    // Frase aleatoria
     const frases = [
       "✨ Disfruta de BlackPink en acción 💖",
       "🌸 Una imagen más de BlackPink 💟",
@@ -19,6 +21,7 @@ let handler = async (m, { conn, command }) => {
     ]
     const frase = frases[Math.floor(Math.random() * frases.length)]
 
+    // Botón aleatorio
     const estilos = [
       "💕 SIGUIENTE 💕","💞 SIGUIENTE 💞","🩷 SIGUIENTE 🩷","💌 SIGUIENTE 💌",
       "🧡 SIGUIENTE 🧡","❤️ SIGUIENTE ❤️","💛 SIGUIENTE 💛","💚 SIGUIENTE 💚",
@@ -28,7 +31,7 @@ let handler = async (m, { conn, command }) => {
     ]
     const estilo = estilos[Math.floor(Math.random() * estilos.length)]
 
-    // fake product como quoted
+    // Fake product como quoted
     const gp = proto.Message.fromObject({
       key: { fromMe: false, participant: '0@s.whatsapp.net' },
       message: {
@@ -50,9 +53,13 @@ let handler = async (m, { conn, command }) => {
       }
     })
 
-    // preparar imagen como media para interactiveMessage
-    const mediaMsg = await conn.prepareMessageMedia({ image: { url: randomkpopx } }, { upload: conn.waUploadToServer })
+    // ✅ generar imageMessage válido
+    const mediaMsg = await generateWAMessageContent(
+      { image: { url: randomkpopx } },
+      { upload: conn.waUploadToServer }
+    )
 
+    // Enviar mensaje interactivo con botón
     await conn.sendMessage(
       m.chat,
       {
@@ -83,6 +90,6 @@ let handler = async (m, { conn, command }) => {
 
 handler.help = ['blackpink']
 handler.tags = ['kpop']
-handler.command = ['blackpink']
+handler.command = ['blackpink','t3']
 
 export default handler
