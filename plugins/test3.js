@@ -1,5 +1,6 @@
 import fetch from 'node-fetch'
 import fs from 'fs'
+import { proto } from '@whiskeysockets/baileys'
 
 let handler = async (m, { conn, command }) => {
   try {
@@ -19,64 +20,61 @@ let handler = async (m, { conn, command }) => {
     const frase = frases[Math.floor(Math.random() * frases.length)]
 
     const estilos = [
-      "💕 SIGUIENTE 💕", "💞 SIGUIENTE 💞", "🩷 SIGUIENTE 🩷", "💌 SIGUIENTE 💌",
-      "🧡 SIGUIENTE 🧡", "❤️ SIGUIENTE ❤️", "💛 SIGUIENTE 💛", "💚 SIGUIENTE 💚",
-      "🩵 SIGUIENTE 🩵", "💙 SIGUIENTE 💙", "💜 SIGUIENTE 💜", "🤍 SIGUIENTE 🤍",
-      "❤️‍🔥 SIGUIENTE ❤️‍🔥", "❣️ SIGUIENTE ❣️", "💓 SIGUIENTE 💓",
-      "💗 SIGUIENTE 💗", "💝 SIGUIENTE 💝", "💖 SIGUIENTE 💖"
+      "💕 SIGUIENTE 💕","💞 SIGUIENTE 💞","🩷 SIGUIENTE 🩷","💌 SIGUIENTE 💌",
+      "🧡 SIGUIENTE 🧡","❤️ SIGUIENTE ❤️","💛 SIGUIENTE 💛","💚 SIGUIENTE 💚",
+      "🩵 SIGUIENTE 🩵","💙 SIGUIENTE 💙","💜 SIGUIENTE 💜","🤍 SIGUIENTE 🤍",
+      "❤️‍🔥 SIGUIENTE ❤️‍🔥","❣️ SIGUIENTE ❣️","💓 SIGUIENTE 💓",
+      "💗 SIGUIENTE 💗","💝 SIGUIENTE 💝","💖 SIGUIENTE 💖"
     ]
     const estilo = estilos[Math.floor(Math.random() * estilos.length)]
 
-    const gp = {
-      key:{fromMe:false,participant:`0@s.whatsapp.net`},
-      message:{
-        productMessage:{
-          product:{
-            productImage:{
-              mimetype:'image/jpeg',
+    // fake product como quoted
+    const gp = proto.Message.fromObject({
+      key: { fromMe: false, participant: '0@s.whatsapp.net' },
+      message: {
+        productMessage: {
+          product: {
+            productImage: {
+              mimetype: 'image/jpeg',
               jpegThumbnail: fs.readFileSync('./storage/img/menu2.jpg')
             },
-            title:`BlackPink`,
-            description:'by GP',
-            currencyCode:'USD',
-            priceAmount1000:'1000000000',
-            retailerId:'Ghost',
-            productImageCount:1
+            title: 'BlackPink',
+            description: 'by GP',
+            currencyCode: 'USD',
+            priceAmount1000: '1000000000',
+            retailerId: 'Ghost',
+            productImageCount: 1
           },
-          businessOwnerJid:`0@s.whatsapp.net`
+          businessOwnerJid: '0@s.whatsapp.net'
         }
       }
-    }
+    })
 
-    conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key } })
+    // preparar imagen como media para interactiveMessage
+    const mediaMsg = await conn.prepareMessageMedia({ image: { url: randomkpopx } }, { upload: conn.waUploadToServer })
 
     await conn.sendMessage(
-  m.chat,
-  {
-    interactiveMessage: {
-      body: { text: frase },
-      footer: { text: namebot },
-      header: {
-        title: 'BlackPink 💖',
-        hasMediaAttachment: true,
-        imageMessage: { url: randomkpopx } // 👈 la imagen
-      },
-      nativeFlowMessage: {
-        buttons: [
-          {
-            name: 'quick_reply',
-            buttonParamsJson: JSON.stringify({
-              display_text: estilo,
-              id: `/${command}`
-            })
+      m.chat,
+      {
+        interactiveMessage: {
+          body: { text: frase },
+          footer: { text: namebot },
+          header: { hasMediaAttachment: true, imageMessage: mediaMsg.imageMessage },
+          nativeFlowMessage: {
+            buttons: [
+              {
+                name: 'quick_reply',
+                buttonParamsJson: JSON.stringify({
+                  display_text: estilo,
+                  id: `/${command}`
+                })
+              }
+            ]
           }
-        ]
-      }
-    }
-  },
-  { quoted: gp }
-)
-
+        }
+      },
+      { quoted: gp }
+    )
   } catch (e) {
     m.reply('❌ Hubo un error al cargar la imagen.')
     console.error(e)
@@ -85,6 +83,6 @@ let handler = async (m, { conn, command }) => {
 
 handler.help = ['blackpink']
 handler.tags = ['kpop']
-handler.command = ['blackpink','t3']
+handler.command = ['blackpink']
 
 export default handler
