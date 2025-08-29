@@ -50,7 +50,7 @@ let handler = async (m, { conn, command }) => {
       namebot, // tu watermark o nombre del bot
       randomkpopx,
       [[estilo, `/${command}`]], // Botón dinámico
-      gp
+      m
     )
   } catch (e) {
     m.reply('❌ Hubo un error al cargar la imagen.')
