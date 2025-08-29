@@ -7,7 +7,6 @@ import chalk from 'chalk'
 import fetch from 'node-fetch'
 import ws from 'ws'
 import fs from 'fs'
-import path from 'path'
 
 const { proto } = (await import('@whiskeysockets/baileys')).default
 const isNumber = x => typeof x === 'number' && !isNaN(x)
