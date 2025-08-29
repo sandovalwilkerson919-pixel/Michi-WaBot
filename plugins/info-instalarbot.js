@@ -16,8 +16,6 @@ const handler = async (m, { conn }) => {
     ]
     const document = docTypes[Math.floor(Math.random() * docTypes.length)]
 
-const gp = {key:{fromMe:false,participant:`0@s.whatsapp.net`},message:{productMessage:{product:{productImage:{mimetype:'image/jpeg',jpegThumbnail:require('fs').readFileSync('./storage/img/menu2.jpg')},title:`Bot`,description:'by GP',currencyCode:'USD',priceAmount1000:'1000000000',retailerId:'Ghost',productImageCount:1},businessOwnerJid:`0@s.whatsapp.net`}}};
-
     const text = `*—◉ 📥 DESCARGAR TERMUX AQUI 📥*
 > 1- termux.uptodown.com/android
     
@@ -74,7 +72,7 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
       headerType: 6
     }
 
-    await conn.sendMessage(m.chat, buttonMessage, { quoted: gp })
+    await conn.sendMessage(m.chat, buttonMessage, { quoted: m })
     await m.react('✅')
 
   } catch (e) {
