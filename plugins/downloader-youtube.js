@@ -58,14 +58,14 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
     if (command === 'play' || command === 'ytmp3') {
       await conn.sendMessage(m.chat, {
-        audio: { url: mp3 }, // aunque no tenga .mp3 funciona
+        audio: { url: mp3 },
         mimetype: 'audio/mpeg',
         fileName: `${title}.mp3`,
         ptt: true
       })
     } else if (command === 'play2' || command === 'ytmp4') {
       await conn.sendMessage(m.chat, {
-        video: { url: mp4 }, // igual, se forza .mp4
+        video: { url: mp4 },
         mimetype: 'video/mp4',
         fileName: `${title}.mp4`,
         ...global.rcanal
