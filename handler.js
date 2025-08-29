@@ -373,7 +373,7 @@ Array.prototype.getRandom = function() {
 global.dfail = (type, m, conn, usedPrefix, command) => {
     let user2 = m.pushName || 'Anónimo'
     const msg = {
-        rowner: `✦ El comando *${command}* solo puede ser usado por mi creador.`,
+        rdueño: `✦ El comando *${command}* solo puede ser usado por mi creador.`,
         owner: `✦ El comando *${command}* solo puede ser usado por los desarrolladores del bot.`,
         mods: `✦ El comando *${command}* solo puede ser usado por los moderadores del bot.`,
         premium: `✦ El comando *${command}* solo puede ser usado por usuarios premium.`,
