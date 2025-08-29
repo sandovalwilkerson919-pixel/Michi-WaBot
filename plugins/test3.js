@@ -41,6 +41,8 @@ let handler = async (m, { conn, command }) => {
     ]
     const estilo = estilos[Math.floor(Math.random() * estilos.length)]
 
+const fproducto = {key:{fromMe:false,participant:`0@s.whatsapp.net`},message:{productMessage:{product:{productImage:{mimetype:'image/jpeg',jpegThumbnail:require('fs').readFileSync('./storage/img/menu2.jpg')},title:`BlackPink`,description:'by GP',currencyCode:'USD',priceAmount1000:'1000000000',retailerId:'Ghost',productImageCount:1},businessOwnerJid:`0@s.whatsapp.net`}}};
+
     conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key } })
     await conn.sendButton(
       m.chat,
@@ -48,7 +50,7 @@ let handler = async (m, { conn, command }) => {
       namebot, // tu watermark o nombre del bot
       randomkpopx,
       [[estilo, `/${command}`]], // Botón dinámico
-      m
+      fproducto
     )
   } catch (e) {
     m.reply('❌ Hubo un error al cargar la imagen.')
