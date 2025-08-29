@@ -42,8 +42,6 @@ const estilos = [
 ]  
 const estilo = estilos[Math.floor(Math.random() * estilos.length)]
 
-const gp = {key:{fromMe:false,participant:0@s.whatsapp.net},message:{productMessage:{product:{productImage:{mimetype:'image/jpeg',jpegThumbnail:require('fs').readFileSync('./storage/img/menu2.jpg')},title:BlackPink,description:'by GP',currencyCode:'USD',priceAmount1000:'1000000000',retailerId:'Ghost',productImageCount:1},businessOwnerJid:0@s.whatsapp.net}}};
-
 conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key } })  
 await conn.sendButton(  
   m.chat,  
