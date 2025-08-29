@@ -40,7 +40,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
     const { filename, downloadUrl, format } = json
 
-    // Mandamos solo audio
+    // Enviamos audio como PTT
     await conn.sendMessage(m.chat, {
       audio: { url: downloadUrl },
       mimetype: 'audio/mpeg',
