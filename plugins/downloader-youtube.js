@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import yts from 'yt-search'
 import fs from 'fs'
 import path from 'path'
 
@@ -31,8 +32,18 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       } catch {}
     }
 
-    // URL nueva de la API
-    const apiUrl = `https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(args[0])}`
+    // Si no es URL, buscamos en YouTube
+    let url = args[0]
+    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+      const search = await yts(args.join(' '))
+      if (!search.videos?.length) {
+        return m.reply({ text: '⚠️ No se encontraron resultados en YouTube.', ...global.rcanal })
+      }
+      url = search.videos[0].url
+    }
+
+    // Llamamos a la API que solo acepta URL
+    const apiUrl = `https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`
     const res = await fetch(apiUrl)
     if (!res.ok) throw new Error('Error al conectar con la API.')
     const json = await res.json()
@@ -40,7 +51,6 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
     const { filename, downloadUrl, format } = json
 
-    // Enviamos audio como PTT
     await conn.sendMessage(m.chat, {
       audio: { url: downloadUrl },
       mimetype: 'audio/mpeg',
@@ -56,7 +66,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     m.reply({
       text: `
 ⟩ ❌ *Ocurrió un error procesando tu solicitud*  
-» Verifica que el enlace sea válido o inténtalo más tarde.
+» Verifica que el enlace o nombre sea válido o inténtalo más tarde.
       `.trim(),
       ...global.rcanal
     })
