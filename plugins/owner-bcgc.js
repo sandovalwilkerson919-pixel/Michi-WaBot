@@ -10,6 +10,7 @@ const handler = async (m, { conn, text }) => {
     return m.reply('⚠️ Debes escribir el mensaje que quieres enviar a todos los grupos.');
   }
 
+  const gp = {key:{fromMe:false,participant:`0@s.whatsapp.net`},message:{productMessage:{product:{productImage:{mimetype:'image/jpeg',jpegThumbnail:require('fs').readFileSync('./storage/img/menu2.jpg')},title:`🛠️ AVISOS MICHI`,description:'by GP',currencyCode:'USD',priceAmount1000:'1000000000',retailerId:'Ghost',productImageCount:1},businessOwnerJid:`0@s.whatsapp.net`}}};
   const fakeContact = {
     key: {
       fromMe: false,
@@ -42,7 +43,7 @@ ${text}
 
       for (const gid of ids) {
         if (grupos[gid].announce) continue;
-        await bot.sendMessage(gid, { text: message }, { quoted: fakeContact });
+        await bot.sendMessage(gid, { text: message }, { quoted: gp });
         totalGrupos++;
       }
     } catch (err) {
