@@ -51,28 +51,22 @@ let handler = async (m, { conn, command }) => {
     conn.sendMessage(m.chat, { react: { text: '🤩', key: m.key } })
 
     await conn.sendMessage(
-  m.chat,
-  {
-    image: { url: randomkpopx },
-    caption: frase,
-    footer: namebot,
-    templateMessage: {
-      hydratedTemplate: {
-        hydratedContentText: frase,
-        hydratedFooterText: namebot,
-        hydratedButtons: [
+      m.chat,
+      {
+        image: { url: randomkpopx },
+        caption: frase,
+        footer: namebot,
+        buttons: [
           {
-            quickReplyButton: {
-              displayText: estilo,
-              id: `/${command}`
-            }
+            buttonId: `/${command}`,
+            buttonText: { displayText: estilo },
+            type: 1
           }
-        ]
-      }
-    }
-  },
-  { quoted: gp }
-)
+        ],
+        headerType: 4
+      },
+      { quoted: gp }
+    )
 
   } catch (e) {
     m.reply('❌ Hubo un error al cargar la imagen.')
