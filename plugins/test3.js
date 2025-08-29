@@ -57,19 +57,14 @@ let handler = async (m, { conn, command, usedPrefix }) => {
         caption: frase,
         footer: 'BlackPink byGP',
         buttons: [
-          {
-            buttonId: `${usedPrefix + command}`,
-            buttonText: { displayText: estilo },
-            type: 1
-          }
-        ],
-        headerType: 4
+          { buttonId: `${usedPrefix + command}`, buttonText: { displayText: estilo }, type: 1 }
+        ]
       },
       { quoted: gp }
     )
 
   } catch (e) {
-    m.reply('❌ Hubo un error al cargar la imagen.')
+    m.reply(`❌ Error: ${e.message}`)
     console.error(e)
   }
 }
