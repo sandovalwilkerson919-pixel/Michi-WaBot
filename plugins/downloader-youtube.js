@@ -42,7 +42,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     },
     message: {
       extendedTextMessage: {
-        text: `📌 *Grupo:* Michi WaBot\n🔗 Únete: https://chat.whatsapp.com/FiqTXI5AxZGD2jylnd0Q8H?mode=ems_copy_c`,
+        text: `📌 Usando Adonix API\n🌾 myapiadonix.vercel.app`,
         title: 'Michi Wa'
       }
     }
