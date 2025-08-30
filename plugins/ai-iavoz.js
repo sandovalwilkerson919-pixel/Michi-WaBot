@@ -1,24 +1,19 @@
 import fetch from 'node-fetch'
 
-async function streamToBuffer(stream) {
-  const chunks = []
-  for await (const chunk of stream) {
-    chunks.push(chunk)
-  }
-  return Buffer.concat(chunks)
-}
-
 let handler = async (m, { conn, text, usedPrefix }) => {
   if (!text) return conn.reply(m.chat, `🗣️ Mande un texto pa que Adonix le hable al toque`, m)
 
   try {
     await conn.sendPresenceUpdate('recording', m.chat)
 
-    const res = await fetch(`https://myapiadonix.vercel.app/api/adonixvoz?q=${encodeURIComponent(text)}`)
-
+    const res = await fetch(`https://myapiadonix.vercel.app/ai/iavoz?q=${encodeURIComponent(text)}`)
     if (!res.ok) throw new Error('No pude obtener audio de Adonix')
 
-    const bufferAudio = await streamToBuffer(res.body)
+    const data = await res.json()
+
+    if (!data.success || !data.audio_base64) throw new Error('Audio no disponible')
+
+    const bufferAudio = Buffer.from(data.audio_base64, 'base64')
 
     await conn.sendMessage(m.chat, {
       audio: bufferAudio,
