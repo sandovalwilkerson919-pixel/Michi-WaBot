@@ -38,7 +38,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     key: {
       fromMe: false,
       participant: "0@s.whatsapp.net",
-      remoteJid: "120363402280020652@g.us"
+      remoteJid: "120363421487163905@g.us"
     },
     message: {
       extendedTextMessage: {
