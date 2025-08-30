@@ -109,7 +109,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
   } catch (e) {
     await conn.sendMessage(m.chat, {
-      text: `@${m.sender.split('@')[0]}, ❌ Ocurrió un error al procesar tu solicitud.`,
+      text: `❌ Ocurrió un error al procesar tu solicitud.`,
       mentions: [m.sender]
     }, { quoted: fkontak })
     console.error(e)
