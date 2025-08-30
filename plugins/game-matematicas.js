@@ -85,6 +85,6 @@ const handler = async (m, { conn, args }) => {
 
 handler.help = ['matematicas']
 handler.tags = ['game']
-handler.command = /^matematicas$/i
+handler.command = /^matematicas|mates$/i
 
 export default handler
