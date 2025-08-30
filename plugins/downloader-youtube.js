@@ -1,125 +1,86 @@
+// Creado por Ado
 import fetch from 'node-fetch'
 import yts from 'yt-search'
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
-  if (!args[0]) {
-    return m.reply({
-      text: `
-⟩ ⚠️ *Uso correcto del comando:*  
-» ${usedPrefix + command} <enlace o nombre de canción/video>  
+  if (!args || args.length === 0) {
+    return m.reply(
+      '⚠️ *Uso:* `' + usedPrefix + command + ' <búsqueda o enlace>`\n' +
+      '📌 Ej: `' + usedPrefix + command + ' vida de barrio`'
+    )
+  }
 
-✦ Ejemplos:  
-• ${usedPrefix + command} https://youtu.be/abcd1234  
-• ${usedPrefix + command} nombre de la canción
-      `.trim(),
-      quoted: m,
-      ...global.rcanal
-    })
+  const query = args.join(' ')
+  const isAudio = ['play', 'ytmp3'].includes(command)
+  const isVideo = ['play2', 'ytmp4'].includes(command)
+
+  if (!isAudio && !isVideo) {
+    return m.reply('❌ Usa *play* (audio) o *play2* (video).')
   }
 
   try {
     await m.react('🕓')
 
-    let url = args[0]
+    let url = query
     let videoInfo = null
 
-    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
-      const search = await yts(args.join(' '))
-      if (!search.videos?.length) {
-        return m.reply({ text: '⚠️ No se encontraron resultados en YouTube.', quoted: m, ...global.rcanal })
-      }
+    if (!/https?:\/\/(www\.)?(youtube\.com|youtu\.be)/i.test(url)) {
+      const search = await yts(query)
+      if (!search.videos?.length) throw new Error('No results')
       videoInfo = search.videos[0]
       url = videoInfo.url
     } else {
-      const id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop()
-      const search = await yts({ videoId: id })
-      if (search?.title) videoInfo = search
+      const idMatch = url.match(/(?:v=|\/v\/|youtu\.be\/|\/shorts\/)([a-zA-Z0-9_-]{11})/)
+      const videoId = idMatch ? idMatch[1] : null
+      if (!videoId) throw new Error('Invalid URL')
+      const search = await yts({ videoId })
+      videoInfo = search || null
+      url = 'https://youtu.be/' + videoId
     }
 
     if (videoInfo.seconds > 3780) {
-      return m.reply({ text: '⛔ El video supera el límite permitido de *63 minutos*.', quoted: m, ...global.rcanal })
+      return m.reply('⛔ *Máx: 63 minutos.*')
     }
 
-    let apiUrl = ''
-    let isAudio = false
+    const apiURL = isAudio
+      ? `https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`
+      : `https://myapiadonix.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`
 
-    if (command === 'play' || command === 'ytmp3') {
-      apiUrl = `https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`
-      isAudio = true
-    } else if (command === 'play2' || command === 'ytmp4') {
-      apiUrl = `https://myapiadonix.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`
-    } else {
-      return m.reply({ text: '❌ Comando no reconocido.', quoted: m, ...global.rcanal })
-    }
-
-    const res = await fetch(apiUrl)
-    if (!res.ok) throw new Error('Error al conectar con la API.')
+    const res = await fetch(apiURL)
     const json = await res.json()
-    if (!json.success) throw new Error('No se pudo obtener información del video.')
+    if (!json.status || !json.result) throw new Error('No data')
 
-    const { title, thumbnail, download, quality } = json.data
+    const { title, thumbnail, quality, download } = json.result
+    const duration = new Date(videoInfo.seconds * 1000).toISOString().substr(11, 8)
 
-    const dur = videoInfo.seconds || 0
-    const h = Math.floor(dur / 3600)
-    const m_ = Math.floor((dur % 3600) / 60)
-    const s = dur % 60
-    const duration = [h, m_, s].map(v => v.toString().padStart(2, '0')).join(':')
+    const caption = `
+📌 *${title.substring(0, 60)}...*
+⏱ ${duration} | 🎵 ${quality}p
+👤 ${videoInfo.author?.name || 'Desconocido'}
+👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}
+    `.trim()
 
-    const views = videoInfo.views.toLocaleString()
-    const ago = videoInfo.ago || "N/D"
-    const author = videoInfo.author?.name || "Desconocido"
-
-    const caption = `*${title}* 
-⏱️ *Duración:* ${duration}  
-👤 *Canal:* ${author}  
-👁️ *Vistas:* ${views}  
-📅 *Publicado:* ${ago}  
-📌 *Calidad:* ${quality || "Auto"}`
+    await conn.sendMessage(m.chat, { image: { url: thumbnail }, caption })
 
     await conn.sendMessage(m.chat, {
-      image: { url: thumbnail },
-      caption,
-      contextInfo: { mentionedJid: [m.sender] },
+      [isAudio ? 'audio' : 'video']: { url: download },
+      mimetype: isAudio ? 'audio/mpeg' : 'video/mp4',
+      fileName: `${title.substring(0, 30)}.${isAudio ? 'mp3' : 'mp4'}`,
+      ptt: false,
       quoted: m,
       ...global.rcanal
     })
-
-    if (isAudio) {
-      await conn.sendMessage(m.chat, {
-        audio: { url: download },
-        mimetype: 'audio/mpeg',
-        fileName: `${title}.mp3`,
-        ptt: false,
-        quoted: m
-      })
-    } else {
-      await conn.sendMessage(m.chat, {
-        video: { url: download },
-        mimetype: 'video/mp4',
-        fileName: `${title}.mp4`,
-        quoted: m,
-        ...global.rcanal
-      })
-    }
 
     await m.react('✅')
 
-  } catch (error) {
-    console.error('Error en comando play/ytmp3/ytmp4:', error)
+  } catch {
     await m.react('❌')
-    m.reply({
-      text: `
-⟩ ❌ *Ocurrió un error procesando tu solicitud*  
-» Verifica que el enlace sea válido o inténtalo más tarde.
-      `.trim(),
-      quoted: m,
-      ...global.rcanal
-    })
+    m.reply('⚠️ Error al descargar. Revisa el enlace o intenta más tarde.')
   }
 }
 
-handler.help = ['play', 'ytmp3', 'play2']
+handler.help = ['play', 'ytmp3', 'play2', 'ytmp4']
 handler.tags = ['downloader']
-handler.command = ['play', 'play2', 'ytmp3']
+handler.command = ['play', 'ytmp3', 'play2', 'ytmp4']
 
 export default handler
