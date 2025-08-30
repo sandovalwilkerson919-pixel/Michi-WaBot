@@ -1,6 +1,8 @@
 // Creado por Ado
 import fetch from 'node-fetch'
 import yts from 'yt-search'
+import fs from 'fs'
+import path from 'path'
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
   if (!args[0]) {
@@ -8,19 +10,37 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       '🎶 *Descarga rápido tu audio o video*\n' +
       '📌 Uso: `' + usedPrefix + command + ' <nombre o enlace>`\n' +
       'Ej: `' + usedPrefix + command + ' vida de barrio`',
-      { quoted: m, ...global.rcanal }
+      { quoted: m }
     )
   }
 
   const isAudio = ['play', 'ytmp3'].includes(command)
-  const isVideo = ['play2', 'ytmp4'].includes(command)
+  const isVideo = ['play2'].includes(command)
 
   if (!isAudio && !isVideo) {
     return m.reply(
       '⚠️ Usa *play* para audio o *play2* para video.',
-      { quoted: m, ...global.rcanal }
+      { quoted: m }
     )
   }
+
+  // Obtener nombre personalizado del bot
+  let nombreBot = global.namebot || 'Bot'
+  const botId = conn.user?.jid?.split('@')[0]
+  if (botId) {
+    const configPath = path.join('./JadiBots', botId, 'config.json')
+    if (fs.existsSync(configPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+        if (config.name) nombreBot = config.name
+      } catch (e) {
+        console.error('Error al leer config.json:', e)
+      }
+    }
+  }
+
+  // Contacto personalizado
+  const fkontak = { key: { fromMe: false, participant: "0@s.whatsapp.net", remoteJid: "status@broadcast" }, message: { contactMessage: { displayName: nombreBot, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;${nombreBot};;;\nFN:${nombreBot}\nEND:VCARD` } } }
 
   try {
     let url = args[0]
@@ -41,8 +61,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
     if (videoInfo.seconds > 3780) {
       return conn.reply(m.chat, `@${m.sender.split('@')[0]}, ⛔ El video no puede superar los 63 minutos.`, m, {
-        mentions: [m.sender],
-        ...global.rcanal
+        mentions: [m.sender]
       })
     }
 
@@ -73,7 +92,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 `.trim(),
       mentions: [m.sender],
       quoted: m,
-      ...global.rcanal
+      ...fkontak
     })
 
     await conn.sendMessage(m.chat, {
@@ -82,19 +101,18 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       fileName: `${title.substring(0, 30)}.${isAudio ? 'mp3' : 'mp4'}`,
       ptt: false,
       quoted: m,
-      ...global.rcanal
+      ...fkontak
     })
 
-  } catch {
+  } catch (e) {
     await conn.reply(m.chat, `@${m.sender.split('@')[0]}, ❌ Ocurrió un error al procesar tu solicitud.`, m, {
-      mentions: [m.sender],
-      ...global.rcanal
+      mentions: [m.sender]
     })
   }
 }
 
 handler.help = ['play', 'ytmp3', 'play2', 'ytmp4']
 handler.tags = ['downloader']
-handler.command = ['play', 'ytmp3', 'play2', 'ytmp4']
+handler.command = ['play', 'ytmp3', 'play2']
 
 export default handler
