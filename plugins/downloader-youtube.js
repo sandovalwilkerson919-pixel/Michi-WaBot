@@ -69,7 +69,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       caption: `📌 *${title.length > 50 ? title.substring(0, 50) + '...' : title}*
 ⏱ ${dur} | 🔊 ${isAudio ? quality + 'kbps' : quality + 'p'}
 👤 ${videoInfo.author?.name || 'Desconocido'}
-👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}\n> Se está procesando su pedido @${senderName}
+👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}\n*Se está procesando su pedido* @${senderName}
 `.trim(),
       mentions: [m.sender],
       quoted: m,
