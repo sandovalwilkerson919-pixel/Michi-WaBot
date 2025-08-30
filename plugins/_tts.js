@@ -1,60 +1,32 @@
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, args, command }) => {
-  const vocesDisponibles = [
-    'optimus_prime',
-    'eminem',
-    'taylor_swift',
-    'nahida',
-    'miku',
-    'nami',
-    'goku',
-    'ana',
-    'elon_musk',
-    'mickey_mouse',
-    'kendrick_lamar',
-    'angela_adkinsh'
-  ]
+let handler = async (m, { conn, args }) => {
+    if (!args[0]) return m.reply('✐ Pon el enlace de YouTube que quieres descargar en audio wey')
 
-  if (args.length < 2) {
-    return m.reply(`✐ Uso correcto:\n.${command} <voz> <texto>\n\n❐ Voces disponibles:\n${vocesDisponibles.join(', ')}`)
-  }
+    try {
+        
+        let url = `https://myapiadonix.vercel.app/download/yt?url=${encodeURIComponent(args[0])}&format=mp3`
+        
+        
+        let res = await fetch(url)
+        let json = await res.json()
 
-  const voiceModel = args[0].toLowerCase()
-  const text = args.slice(1).join(' ')
+        if (!json.status) return m.reply('✐ No se pudo descargar el audio wey')
 
-  if (!vocesDisponibles.includes(voiceModel)) {
-    return m.reply(`✐ Voz "${voiceModel}" no encontrada.\n❐ Voces disponibles:\n${vocesDisponibles.join(', ')}`)
-  }
+        let { title, download } = json.result
 
-  try {
-    const res = await fetch(`https://zenzxz.dpdns.org/tools/text2speech?text=${encodeURIComponent(text)}`)
-    const json = await res.json()
+        
+        await conn.sendMessage(m.chat, {
+            audio: { url: download },
+            mimetype: 'audio/mpeg',
+            fileName: `${title}.mp3`
+        }, { quoted: m })
 
-    if (!json.status || !Array.isArray(json.results)) {
-      return m.reply('✦ Error al obtener datos de la API.')
+    } catch (e) {
+        console.log(e)
+        m.reply('✐ Ocurrió un error wey, intenta otra vez')
     }
-
-    const voice = json.results.find(v => v.model === voiceModel)
-    if (!voice || !voice.audio_url) {
-      return m.reply('✿ No se pudo generar el audio con esa voz.')
-    }
-
-    const audioRes = await fetch(voice.audio_url)
-    const audioBuffer = await audioRes.arrayBuffer()
-
-    await conn.sendMessage(m.chat, {
-      audio: Buffer.from(audioBuffer),
-      mimetype: 'audio/mpeg',
-      ptt: true
-    }, { quoted: m })
-
-  } catch (e) {
-    console.error(e)
-    m.reply('✐ Ocurrió un error al generar el audio.')
-  }
 }
 
-handler.command = /^ttsx$/i
-handler.register = true
+handler.command = ['audio'] 
 export default handler
