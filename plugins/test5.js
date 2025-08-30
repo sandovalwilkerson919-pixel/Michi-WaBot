@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 
 let handler = async(m, { conn, args, usedPrefix, command }) => {
 
-fetch('https://raw.githubusercontent.com/GianPoolS/Mis-Archivos/refs/heads/main/doraemon.txt?token=GHSAT0AAAAAADKFZKB3FQPPLUSRTCRD24DC2FTCFAA').then(res => res.text()).then(body => {
+fetch('https://raw.githubusercontent.com/GianPoolS/Mis-Archivos/refs/heads/main/doraemon.txt?token=GHSAT0AAAAAADKFZKB2PQJL3DEWFBQNYEB62FTCLEA').then(res => res.text()).then(body => {
 
 let randomkpop = body.split('\n')
 
