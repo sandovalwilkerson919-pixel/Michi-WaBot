@@ -6,24 +6,18 @@ let handler = async (m, { conn }) => {
       remoteJid: "status@broadcast"
     },
     message: {
-      contactMessage: {
-        displayName: "Michi Sub Bots",
-        vcard: `BEGIN:VCARD
-VERSION:3.0
-FN:Michi Sub Bots
-ORG:Michi Sub Bots
-TEL;type=CELL;waid=0:+0
-URL:https://chat.whatsapp.com/FiqTXI5AxZGD2jylnd0Q8H?mode=ems_copy_c
-NOTE:Únete al grupo tocando aquí
-END:VCARD`
+      extendedTextMessage: {
+        text: "📌 Únete al grupo Michi Sub Bots 😎\n🔗 https://chat.whatsapp.com/FiqTXI5AxZGD2jylnd0Q8H",
+        title: "Michi Sub Bots"
       }
     }
   }
 
   await conn.sendMessage(m.chat, {
-    text: "📌 Prueba de fkontak para unirse al grupo Michi Sub Bots 😎",
+    text: "¡Toca el mensaje para unirte al grupo! 👇"
   }, { quoted: fkontak })
 }
+
 
 handler.command = ['test']
 
