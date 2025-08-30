@@ -10,45 +10,39 @@ Sigue las instrucciones:
 ✎ *Ejemplo ›* ${usedPrefix + command} gatito kawaii con fondo rosa
 
 Recuerda que la imagen puede tardar unos segundos en generarse.
-↺ Sé paciente mientras se crea tu imagen.`)
+↺ Sé paciente mientras se crea tu imagen.`, m)
 
   try {
-    
     await conn.sendMessage(m.chat, { react: { text: '🕒', key: m.key } })
 
-    
     const api = `https://myapiadonix.vercel.app/ai/iaimagen?prompt=${encodeURIComponent(prompt)}`
     const res = await fetch(api)
     if (!res.ok) throw new Error(`Error HTTP ${res.status}`)
 
-    
     const buffer = await res.buffer()
 
-    
-    await conn.sendMessage(m.chat, {
-      image: buffer,
-      caption: `
+    await conn.sendMessage(
+      m.chat,
+      {
+        image: buffer,
+        caption: `
 ✿ *¡Imagen Generada!*
 
 Detalles:
 ✎ *Prompt ›* ${prompt}
 ↺ Disfruta tu nueva creación.
-      `.trim(),
-      footer: 'Adonix API',
-      buttons: [
-        { buttonId: `${usedPrefix}${command} ${prompt}`, buttonText: { displayText: '♻️ Otra' }, type: 1 },
-        { buttonId: `${usedPrefix}menu`, buttonText: { displayText: '❄️ Ir al menu' }, type: 1 }
-      ],
-      headerType: 4
-    }, { quoted: m })
+        `.trim(),
+        footer: 'Adonix API'
+      },
+      { quoted: m }
+    )
 
-    
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
   } catch (e) {
     console.error('Error generando imagen:', e)
     await conn.sendMessage(m.chat, { react: { text: '✖️', key: m.key } })
-    m.reply('✿ *Error ›* No se pudo generar la imagen, inténtalo más tarde.')
+    m.reply('✿ *Error ›* No se pudo generar la imagen, inténtalo más tarde.', m)
   }
 }
 
