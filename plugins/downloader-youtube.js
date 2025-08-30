@@ -82,9 +82,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     const ago = videoInfo.ago || "N/D"
     const author = videoInfo.author?.name || "Desconocido"
 
-    const caption = `✦ *Información del video* ✦
-
-🎬 *Título:* ${title}  
+    const caption = `*${title}* 
 ⏱️ *Duración:* ${duration}  
 👤 *Canal:* ${author}  
 👁️ *Vistas:* ${views}  
