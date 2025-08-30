@@ -1,4 +1,5 @@
 // Creado por Ado
+// -- No quites créditos.
 import fetch from 'node-fetch'
 import yts from 'yt-search'
 import fs from 'fs'
@@ -6,25 +7,20 @@ import path from 'path'
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
   if (!args[0]) {
-    return m.reply(
-      '🎶 *Descarga rápido tu audio o video*\n' +
-      '📌 Uso: `' + usedPrefix + command + ' <nombre o enlace>`\n' +
-      'Ej: `' + usedPrefix + command + ' vida de barrio`',
-      { quoted: m }
-    )
+    return conn.sendMessage(m.chat, {
+      text: '🎶 *Descarga rápido tu audio o video*\n' +
+            '📌 Uso: `' + usedPrefix + command + ' <nombre o enlace>`\n' +
+            'Ej: `' + usedPrefix + command + ' vida de barrio`'
+    }, { quoted: fkontak })
   }
 
   const isAudio = ['play', 'ytmp3'].includes(command)
   const isVideo = ['play2'].includes(command)
 
   if (!isAudio && !isVideo) {
-    return m.reply(
-      '⚠️ Usa *play* para audio o *play2* para video.',
-      { quoted: m }
-    )
+    return conn.sendMessage(m.chat, { text: '⚠️ Usa *play* para audio o *play2* para video.' }, { quoted: fkontak })
   }
 
-  
   let nombreBot = global.namebot || 'Bot'
   const botId = conn.user?.jid?.split('@')[0]
   if (botId) {
@@ -39,8 +35,15 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     }
   }
 
-  
-  const fkontak = { key: { fromMe: false, participant: "0@s.whatsapp.net", remoteJid: "status@broadcast" }, message: { contactMessage: { displayName: nombreBot, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;${nombreBot};;;\nFN:${nombreBot}\nEND:VCARD` } } }
+  const fkontak = {
+    key: { fromMe: false, participant: "0@s.whatsapp.net", remoteJid: "status@broadcast" },
+    message: {
+      contactMessage: {
+        displayName: nombreBot,
+        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;${nombreBot};;;\nFN:${nombreBot}\nEND:VCARD`
+      }
+    }
+  }
 
   try {
     let url = args[0]
@@ -60,9 +63,10 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     }
 
     if (videoInfo.seconds > 3780) {
-      return conn.reply(m.chat, `@${m.sender.split('@')[0]}, ⛔ El video no puede superar los 63 minutos.`, m, {
+      return conn.sendMessage(m.chat, {
+        text: `@${m.sender.split('@')[0]}, ⛔ El video no puede superar los 63 minutos.`,
         mentions: [m.sender]
-      })
+      }, { quoted: fkontak })
     }
 
     const apiURL = isAudio
@@ -88,26 +92,24 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       caption: `📌 *${title.length > 50 ? title.substring(0, 50) + '...' : title}*
 ⏱ ${dur} | 🔊 ${isAudio ? quality + 'kbps' : quality + 'p'}
 👤 ${videoInfo.author?.name || 'Desconocido'}
-👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}\n*Se está procesando su pedido* @${senderName}
-`.trim(),
-      mentions: [m.sender],
-      quoted: m,
-      ...fkontak
-    })
+👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}
+*Se está procesando su pedido* @${senderName}`
+      .trim(),
+      mentions: [m.sender]
+    }, { quoted: fkontak })
 
     await conn.sendMessage(m.chat, {
       [isAudio ? 'audio' : 'video']: { url: downloadUrl },
       mimetype: isAudio ? 'audio/mpeg' : 'video/mp4',
       fileName: `${title.substring(0, 30)}.${isAudio ? 'mp3' : 'mp4'}`,
-      ptt: false,
-      quoted: m,
-      ...fkontak
-    })
+      ptt: false
+    }, { quoted: fkontak })
 
   } catch (e) {
-    await conn.reply(m.chat, `@${m.sender.split('@')[0]}, ❌ Ocurrió un error al procesar tu solicitud.`, m, {
+    await conn.sendMessage(m.chat, {
+      text: `@${m.sender.split('@')[0]}, ❌ Ocurrió un error al procesar tu solicitud.`,
       mentions: [m.sender]
-    })
+    }, { quoted: fkontak })
   }
 }
 
