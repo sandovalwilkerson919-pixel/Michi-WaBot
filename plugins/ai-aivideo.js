@@ -9,7 +9,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }, { quoted: m });
 
     
-    let apiURL = `https://myapiadonix.vercel.app/api/veo3?prompt=${encodeURIComponent(text)}&apikey=adonixveo3`;
+    let apiURL = `https://myapiadonix.vercel.app/ai/veo3?prompt=${encodeURIComponent(text)}&apikey=adonixveo3`;
     
     let res = await fetch(apiURL);
     let json = await res.json();
