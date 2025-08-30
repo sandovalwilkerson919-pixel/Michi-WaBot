@@ -3,43 +3,49 @@ import fetch from 'node-fetch'
 import yts from 'yt-search'
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
-  if (!args || args.length === 0) {
+  if (!args[0]) {
     return m.reply(
-      '⚠️ *Uso:* `' + usedPrefix + command + ' <búsqueda o enlace>`\n' +
-      '📌 Ej: `' + usedPrefix + command + ' vida de barrio`'
+      '🎶 *Descarga rápido tu audio o video*\n' +
+      '📌 Uso: `' + usedPrefix + command + ' <nombre o enlace>`\n' +
+      'Ej: `' + usedPrefix + command + ' vida de barrio`',
+      { quoted: m, ...global.rcanal }
     )
   }
 
-  const query = args.join(' ')
   const isAudio = ['play', 'ytmp3'].includes(command)
   const isVideo = ['play2', 'ytmp4'].includes(command)
 
   if (!isAudio && !isVideo) {
-    return m.reply('❌ Usa *play* (audio) o *play2* (video).')
+    return m.reply(
+      '⚠️ Usa *play* para audio o *play2* para video.',
+      { quoted: m, ...global.rcanal }
+    )
   }
 
   try {
     await m.react('🕓')
 
-    let url = query
+    let url = args[0]
     let videoInfo = null
 
-    if (!/https?:\/\/(www\.)?(youtube\.com|youtu\.be)/i.test(url)) {
-      const search = await yts(query)
-      if (!search.videos?.length) throw new Error('No results')
+    if (!/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)/i.test(url)) {
+      const search = await yts(args.join(' '))
+      if (!search.videos?.length) throw new Error('No encontrado')
       videoInfo = search.videos[0]
       url = videoInfo.url
     } else {
-      const idMatch = url.match(/(?:v=|\/v\/|youtu\.be\/|\/shorts\/)([a-zA-Z0-9_-]{11})/)
-      const videoId = idMatch ? idMatch[1] : null
-      if (!videoId) throw new Error('Invalid URL')
-      const search = await yts({ videoId })
+      const id = url.match(/(?:v=|\/v\/|youtu\.be\/|\/shorts\/)([a-zA-Z0-9_-]{11})/)?.[1]
+      if (!id) throw new Error('URL inválida')
+      const search = await yts({ videoId: id })
       videoInfo = search || null
-      url = 'https://youtu.be/' + videoId
+      url = 'https://youtu.be/' + id
     }
 
     if (videoInfo.seconds > 3780) {
-      return m.reply('⛔ *Máx: 63 minutos.*')
+      return m.reply(
+        '⛔ *Límite: 63 minutos*',
+        { quoted: m, ...global.rcanal }
+      )
     }
 
     const apiURL = isAudio
@@ -48,22 +54,31 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
     const res = await fetch(apiURL)
     const json = await res.json()
-    if (!json.status || !json.result) throw new Error('No data')
 
-    const { title, thumbnail, quality, download } = json.result
-    const duration = new Date(videoInfo.seconds * 1000).toISOString().substr(11, 8)
+    if (isAudio && (!json.status || !json.data)) throw new Error('Audio no disponible')
+    if (isVideo && (!json.status || !json.result)) throw new Error('Video no disponible')
 
-    const caption = `
-📌 *${title.substring(0, 60)}...*
-⏱ ${duration} | 🎵 ${quality}p
-👤 ${videoInfo.author?.name || 'Desconocido'}
-👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}
-    `.trim()
+    const title = isAudio ? json.data.title : json.result.title
+    const thumbnail = isAudio ? json.data.thumbnail : json.result.thumbnail
+    const downloadUrl = isAudio ? json.data.download : json.result.download
+    const quality = isAudio ? '128' : (json.result.quality || '360')
 
-    await conn.sendMessage(m.chat, { image: { url: thumbnail }, caption })
+    const dur = new Date(videoInfo.seconds * 1000).toISOString().substr(11, 8)
 
     await conn.sendMessage(m.chat, {
-      [isAudio ? 'audio' : 'video']: { url: download },
+      image: { url: thumbnail },
+      caption: `
+📌 *${title.length > 50 ? title.substring(0, 50) + '...' : title}*
+⏱ ${dur} | 🔊 ${isAudio ? quality + 'kbps' : quality + 'p'}
+👤 ${videoInfo.author?.name || 'Desconocido'}
+👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}
+`.trim(),
+      quoted: m,
+      ...global.rcanal
+    })
+
+    await conn.sendMessage(m.chat, {
+      [isAudio ? 'audio' : 'video']: { url: downloadUrl },
       mimetype: isAudio ? 'audio/mpeg' : 'video/mp4',
       fileName: `${title.substring(0, 30)}.${isAudio ? 'mp3' : 'mp4'}`,
       ptt: false,
@@ -75,7 +90,11 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
   } catch {
     await m.react('❌')
-    m.reply('⚠️ Error al descargar. Revisa el enlace o intenta más tarde.')
+    m.reply(
+      '⚠️ Ocurrió un error al procesar tu solicitud.\n' +
+      'Verifica el enlace o inténtalo más tarde.',
+      { quoted: m, ...global.rcanal }
+    )
   }
 }
 
