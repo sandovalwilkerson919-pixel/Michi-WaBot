@@ -44,15 +44,15 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     let uploadedUrl = await uploadImage(img)  
 
-    // Usar la nueva API
-    const apiUrl = `https://myapiadonix.vercel.app/api/ends/upscale?imageUrl=${encodeURIComponent(uploadedUrl)}`  
+    // --> Usar la nueva API
+    const apiUrl = `https://myapiadonix.vercel.app/tools/upscale?url=${encodeURIComponent(uploadedUrl)}`  
     const res = await fetch(apiUrl)  
     if (!res.ok) throw new Error(`Error en la API: ${res.statusText}`)  
     const data = await res.json()  
 
-    if (data.status !== 'success' || !data.result_url) throw new Error('No se pudo mejorar la imagen.')  
+    if (!data.status || !data.result) throw new Error('No se pudo mejorar la imagen.')  
 
-    const improvedRes = await fetch(data.result_url)  
+    const improvedRes = await fetch(data.result)  
     const buffer = await improvedRes.buffer()  
 
     await conn.sendMessage(m.chat, {  
