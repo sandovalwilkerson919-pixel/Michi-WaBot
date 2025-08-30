@@ -36,11 +36,31 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
   }
 
   const fkontak = {
-    key: { fromMe: false, participant: "0@s.whatsapp.net", remoteJid: "status@broadcast" },
+    key: { 
+      fromMe: false, 
+      participant: "0@s.whatsapp.net", 
+      remoteJid: "status@broadcast" 
+    },
     message: {
       contactMessage: {
         displayName: nombreBot,
-        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;${nombreBot};;;\nFN:${nombreBot}\nEND:VCARD`
+        vcard: `BEGIN:VCARD\nVERSION:3.0
+N:;${nombreBot};;;
+FN:${nombreBot}
+ORG:${nombreBot} Corporation
+TITLE:Sistema de Compras
+EMAIL;type=INTERNET:${nombreBot.toLowerCase()}@example.com
+TEL;type=CELL;waid=5210000000000:+52 100 000 0000
+URL:https://example.com/${nombreBot.toLowerCase()}
+NOTE:🛒 Procesando carrito...
+▒▒▒▒▒▒▒▒▒▒ 0%
+▓▒▒▒▒▒▒▒▒▒ 25%
+▓▓▒▒▒▒▒▒▒▒ 50%
+▓▓▓▒▒▒▒▒▒▒ 75%
+▓▓▓▓▓▓▓▓▓▓ 100%
+✅ Orden lista
+🟢 SUCCESS ✅
+END:VCARD`
       }
     }
   }
@@ -93,7 +113,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 ⏱ ${dur} | 🔊 ${isAudio ? quality + 'kbps' : quality + 'p'}
 👤 ${videoInfo.author?.name || 'Desconocido'}
 👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}
-*Se está procesando su pedido* @${senderName}`
+*Pedido listo* @${senderName}`
       .trim(),
       mentions: [m.sender]
     }, { quoted: fkontak })
