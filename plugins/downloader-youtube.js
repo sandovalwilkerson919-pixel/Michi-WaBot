@@ -24,7 +24,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     )
   }
 
-  // Obtener nombre personalizado del bot
+  
   let nombreBot = global.namebot || 'Bot'
   const botId = conn.user?.jid?.split('@')[0]
   if (botId) {
@@ -39,7 +39,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     }
   }
 
-  // Contacto personalizado
+  
   const fkontak = { key: { fromMe: false, participant: "0@s.whatsapp.net", remoteJid: "status@broadcast" }, message: { contactMessage: { displayName: nombreBot, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;${nombreBot};;;\nFN:${nombreBot}\nEND:VCARD` } } }
 
   try {
