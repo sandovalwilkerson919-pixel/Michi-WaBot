@@ -23,8 +23,6 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
   }
 
   try {
-    await m.react('🕓')
-
     let url = args[0]
     let videoInfo = null
 
@@ -42,10 +40,10 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     }
 
     if (videoInfo.seconds > 3780) {
-      return m.reply(
-        '⛔ *Límite: 63 minutos*',
-        { quoted: m, ...global.rcanal }
-      )
+      return conn.reply(m.chat, `@${m.sender.split('@')[0]}, ⛔ El video no puede superar los 63 minutos.`, m, {
+        mentions: [m.sender],
+        ...global.rcanal
+      })
     }
 
     const apiURL = isAudio
@@ -64,15 +62,16 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     const quality = isAudio ? '128' : (json.result.quality || '360')
 
     const dur = new Date(videoInfo.seconds * 1000).toISOString().substr(11, 8)
+    const senderName = m.sender.split('@')[0]
 
     await conn.sendMessage(m.chat, {
       image: { url: thumbnail },
-      caption: `
-📌 *${title.length > 50 ? title.substring(0, 50) + '...' : title}*
+      caption: `📌 *${title.length > 50 ? title.substring(0, 50) + '...' : title}*
 ⏱ ${dur} | 🔊 ${isAudio ? quality + 'kbps' : quality + 'p'}
 👤 ${videoInfo.author?.name || 'Desconocido'}
-👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}
+👁️ ${videoInfo.views?.toLocaleString()} | 📅 ${videoInfo.ago}\n> Se está procesando su pedido @${senderName}
 `.trim(),
+      mentions: [m.sender],
       quoted: m,
       ...global.rcanal
     })
@@ -86,15 +85,11 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       ...global.rcanal
     })
 
-    await m.react('✅')
-
   } catch {
-    await m.react('❌')
-    m.reply(
-      '⚠️ Ocurrió un error al procesar tu solicitud.\n' +
-      'Verifica el enlace o inténtalo más tarde.',
-      { quoted: m, ...global.rcanal }
-    )
+    await conn.reply(m.chat, `@${m.sender.split('@')[0]}, ❌ Ocurrió un error al procesar tu solicitud.`, m, {
+      mentions: [m.sender],
+      ...global.rcanal
+    })
   }
 }
 
