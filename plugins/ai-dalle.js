@@ -13,18 +13,18 @@ Recuerda que la imagen puede tardar unos segundos en generarse.
 ↺ Sé paciente mientras se crea tu imagen.`)
 
   try {
-    // Reaccionar con reloj mientras genera
+    
     await conn.sendMessage(m.chat, { react: { text: '🕒', key: m.key } })
 
-    // Llamada a tu API que devuelve la imagen directamente
-    const api = `https://myapiadonix.vercel.app/api/IAimagen?prompt=${encodeURIComponent(prompt)}`
+    
+    const api = `https://myapiadonix.vercel.app/ai/iaimagen?prompt=${encodeURIComponent(prompt)}`
     const res = await fetch(api)
     if (!res.ok) throw new Error(`Error HTTP ${res.status}`)
 
-    // Convertir la respuesta en buffer (imagen)
+    
     const buffer = await res.buffer()
 
-    // Enviar la imagen con botones
+    
     await conn.sendMessage(m.chat, {
       image: buffer,
       caption: `
@@ -42,7 +42,7 @@ Detalles:
       headerType: 4
     }, { quoted: m })
 
-    // Reaccionar con check
+    
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
   } catch (e) {
