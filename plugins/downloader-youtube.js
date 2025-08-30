@@ -93,6 +93,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       image: { url: thumbnail },
       caption,
       contextInfo: { mentionedJid: [m.sender] },
+      quoted: m,
       ...global.rcanal
     })
 
@@ -101,13 +102,15 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         audio: { url: download },
         mimetype: 'audio/mpeg',
         fileName: `${title}.mp3`,
-        ptt: false
+        ptt: false,
+        quoted: m
       })
     } else {
       await conn.sendMessage(m.chat, {
         video: { url: download },
         mimetype: 'video/mp4',
         fileName: `${title}.mp4`,
+        quoted: m,
         ...global.rcanal
       })
     }
@@ -122,6 +125,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 ⟩ ❌ *Ocurrió un error procesando tu solicitud*  
 » Verifica que el enlace sea válido o inténtalo más tarde.
       `.trim(),
+      quoted: m,
       ...global.rcanal
     })
   }
