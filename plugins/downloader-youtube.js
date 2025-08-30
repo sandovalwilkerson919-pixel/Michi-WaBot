@@ -1,7 +1,5 @@
 import fetch from 'node-fetch'
 import yts from 'yt-search'
-import fs from 'fs'
-import path from 'path'
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
   if (!args[0]) {
@@ -14,6 +12,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 • ${usedPrefix + command} https://youtu.be/abcd1234  
 • ${usedPrefix + command} nombre de la canción
       `.trim(),
+      quoted: m,
       ...global.rcanal
     })
   }
@@ -21,25 +20,13 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
   try {
     await m.react('🕓')
 
-    const botId = conn.user?.jid?.split('@')[0].replace(/\D/g, '') || ''
-    const configPath = path.join('./JadiBots', botId, 'config.json')
-
-    let nombreBot = global.namebot || '⎯⎯⎯⎯⎯⎯ Bot Principal ⎯⎯⎯⎯⎯⎯'
-
-    if (fs.existsSync(configPath)) {
-      try {
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
-        if (config.name) nombreBot = config.name
-      } catch {}
-    }
-
     let url = args[0]
     let videoInfo = null
 
     if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
       const search = await yts(args.join(' '))
       if (!search.videos?.length) {
-        return m.reply({ text: '⚠️ No se encontraron resultados en YouTube.', ...global.rcanal })
+        return m.reply({ text: '⚠️ No se encontraron resultados en YouTube.', quoted: m, ...global.rcanal })
       }
       videoInfo = search.videos[0]
       url = videoInfo.url
@@ -50,7 +37,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     }
 
     if (videoInfo.seconds > 3780) {
-      return m.reply({ text: '⛔ El video supera el límite permitido de *63 minutos*.', ...global.rcanal })
+      return m.reply({ text: '⛔ El video supera el límite permitido de *63 minutos*.', quoted: m, ...global.rcanal })
     }
 
     let apiUrl = ''
@@ -62,7 +49,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     } else if (command === 'play2' || command === 'ytmp4') {
       apiUrl = `https://myapiadonix.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`
     } else {
-      return m.reply({ text: '❌ Comando no reconocido.', ...global.rcanal })
+      return m.reply({ text: '❌ Comando no reconocido.', quoted: m, ...global.rcanal })
     }
 
     const res = await fetch(apiUrl)
