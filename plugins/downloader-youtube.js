@@ -99,9 +99,9 @@ END:VCARD`
     if (isAudio && (!json.status || !json.data)) throw new Error('Audio no disponible')
     if (isVideo && (!json.status || !json.result)) throw new Error('Video no disponible')
 
-    const title = isAudio ? json.data.title : json.result.title
-    const thumbnail = isAudio ? json.data.thumbnail : json.result.thumbnail
-    const downloadUrl = isAudio ? json.data.download : json.result.download
+    const title = isAudio ? json.result.title : json.result.title
+    const thumbnail = isAudio ? json.result.thumbnail : json.result.thumbnail
+    const downloadUrl = isAudio ? json.result.download : json.result.download
     const quality = isAudio ? '128' : (json.result.quality || '360')
 
     const dur = new Date(videoInfo.seconds * 1000).toISOString().substr(11, 8)
