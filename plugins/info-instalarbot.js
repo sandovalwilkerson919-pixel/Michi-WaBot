@@ -31,20 +31,33 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
 > 5- npm install
 > 6- npm start
 
+*—◉ ESCRIBE O PEGA EN 1 LINEA:*
+> 1- termux-setup-storage && apt update && apt upgrade -y && pkg install -y git nodejs ffmpeg imagemagick && git clone https://github.com/Ado-rgb/Michi-WaBot.git && cd Michi-WaBot && npm install && npm start
+
 ------------------------------------
 
 *—◉ ✔️ ACTIVAR EN CASO DE DETENERSE EN TERMUX ✔️*
 ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
 > 1- cd Michi-WaBot
-> 2- npm start
+> 2- git pull
+> 3- npm start
+
+*—◉ ESCRIBE O PEGA EN 1 LINEA:*
+> 1- cd Michi-WaBot && git pull && npm start
 
 ------------------------------------
 
 *—◉ 👽 OBTENER OTRO CODIGO QR EN TERMUX 👽*
 ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
-> 1- cd Michi-WaBot
-> 2- rm -rf Sessions
-> 3- npm start`.trim()
+> 1- (Parar Bot con) Ctrl + C
+> 2- cd Michi-WaBot
+> 3- rm -rf Sessions
+> 4- git pull
+> 5- npm start
+
+*—◉ ESCRIBE O PEGA EN 1 LINEA:*
+> 1- (Parar Bot con) Ctrl + C
+> 2- cd Michi-WaBot && rm -rf Sessions && git pull && npm start`.trim()
 
     const namebot = '𝖠𝖨 | 𝖬𝗂𝖼𝗁𝗂 🧃'
 
