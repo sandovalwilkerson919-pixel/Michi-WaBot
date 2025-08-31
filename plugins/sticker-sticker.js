@@ -53,7 +53,7 @@ async function sticker(img, url, packname, author) {
 
     ff.addOutputOptions([
       `-vcodec`, `libwebp`, `-vf`,
-      `scale='min(512,iw)':min'(512,ih)':force_original_aspect_ratio=decrease,fps=15, pad=512:512:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`
+      `scale=512:512:force_original_aspect_ratio=increase,crop=512:512,fps=15,split [a][b];[a] palettegen=reserve_transparent=on:transparency_color=ffffff [p];[b][p] paletteuse`
     ])
       .toFormat('webp')
       .save(outFile)
