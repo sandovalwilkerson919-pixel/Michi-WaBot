@@ -1,42 +1,55 @@
-import axios from 'axios'
-import yts from 'yt-search'
+import axios from 'axios';
+import yts from 'yt-search';
 
-let handler = async (m, { conn, args, command, usedPrefix }) => {
-    if (!args || !args.join(" ")) return m.reply(`📌 ${usedPrefix + command} <link o nombre>`)
+let handler = async (m, { conn, args, command }) => {
+  if (!args || !args.length) return m.reply(' Pon un nombre de canción o enlace ');
 
-    const query = args.join(" ")
+  let searchQuery = args.join(' ');
 
-    
-    await conn.sendPresenceUpdate('recording', m.chat) 
+  await conn.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
 
-    let url = query
-    if (!query.match(/https?:\/\//)) {
-        const search = await yts(query)
-        if (!search || !search.videos.length) {
-            await conn.sendPresenceUpdate('available', m.chat)
-            return m.reply('❌ No encontré nada :v')
-        }
-        url = search.videos[0].url
+  try {
+    let url = searchQuery;
+    if (!searchQuery.includes('http')) {
+      const search = await yts(searchQuery);
+      if (!search || !search.all.length) return m.reply('😢 No encontré nada wey');
+      url = search.all[0].url;
     }
 
-    try {
-        if (command === 'ytmp3' || command === 'play') {
-            const res = await axios.get(`https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`)
-            if (!res.data?.result?.url) return m.reply('❌ Error al descargar audio')
-            await conn.sendMessage(m.chat, { audio: { url: res.data.result.url }, mimetype: 'audio/mpeg', fileName: res.data.result.title + '.mp3' }, { quoted: m })
-        } else if (command === 'play2') {
-            const res = await axios.get(`https://myapiadonix.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`)
-            if (!res.data?.result?.url) return m.reply('❌ Error al descargar video')
-            await conn.sendMessage(m.chat, { video: { url: res.data.result.url }, mimetype: 'video/mp4', fileName: res.data.result.title + '.mp4' }, { quoted: m })
-        }
-    } catch (e) {
-        console.log(e)
-        m.reply('❌ Ocurrió un error al descargar el archivo')
+    if (command === 'play' || command === 'ytmp3') {
+      const res = await axios.get(`https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`);
+      if (!res.data?.result?.url) return m.reply('😢 No se pudo obtener el audio');
+      const title = res.data.result.title;
+      const audioUrl = res.data.result.url;
+
+      await conn.sendMessage(m.chat, {
+        audio: { url: audioUrl },
+        mimetype: 'audio/mpeg',
+        fileName: `${title}.mp3`
+      });
     }
 
-    
-    await conn.sendPresenceUpdate('available', m.chat)
-}
+    if (command === 'play2') {
+      const res = await axios.get(`https://myapiadonix.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`);
+      if (!res.data?.result?.url) return m.reply('😢 No se pudo obtener el video');
+      const title = res.data.result.title;
+      const videoUrl = res.data.result.url;
 
-handler.command = /^(play|ytmp3|play2)$/i
-export default handler
+      await conn.sendMessage(m.chat, {
+        video: { url: videoUrl },
+        mimetype: 'video/mp4',
+        fileName: `${title}.mp4`
+      });
+    }
+
+  } catch (e) {
+    console.log(e);
+    m.reply('🔥 Ocurrió un error wey, intenta de nuevo');
+  }
+};
+
+handler.help = ['play <nombre o link>', 'ytmp3 <nombre o link>', 'play2 <nombre o link>'];
+handler.tags = ['downloader'];
+handler.command = /^(play|ytmp3|play2)$/i;
+
+export default handler;
