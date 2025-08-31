@@ -6,8 +6,7 @@ let handler = async (m, { conn, args }) => {
     try {
         
         let url = `https://myapiadonix.vercel.app/download/yt?url=${encodeURIComponent(args[0])}&format=mp3`
-        
-        
+
         let res = await fetch(url)
         let json = await res.json()
 
