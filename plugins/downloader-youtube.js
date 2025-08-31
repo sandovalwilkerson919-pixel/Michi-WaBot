@@ -6,6 +6,7 @@ let handler = async (m, { conn, args, command }) => {
 
   let searchQuery = args.join(' ');
 
+  
   await conn.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
 
   try {
@@ -18,9 +19,9 @@ let handler = async (m, { conn, args, command }) => {
 
     if (command === 'play' || command === 'ytmp3') {
       const res = await axios.get(`https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`);
-      if (!res.data?.result?.url) return m.reply('😢 No se pudo obtener el audio');
-      const title = res.data.result.title;
-      const audioUrl = res.data.result.url;
+      if (!res.data?.status || !res.data.url) return m.reply('😢 No se pudo obtener el audio');
+      const title = res.data.title;
+      const audioUrl = res.data.url;
 
       await conn.sendMessage(m.chat, {
         audio: { url: audioUrl },
@@ -31,9 +32,9 @@ let handler = async (m, { conn, args, command }) => {
 
     if (command === 'play2') {
       const res = await axios.get(`https://myapiadonix.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`);
-      if (!res.data?.result?.url) return m.reply('😢 No se pudo obtener el video');
-      const title = res.data.result.title;
-      const videoUrl = res.data.result.url;
+      if (!res.data?.status || !res.data.url) return m.reply('😢 No se pudo obtener el video');
+      const title = res.data.title;
+      const videoUrl = res.data.url;
 
       await conn.sendMessage(m.chat, {
         video: { url: videoUrl },
@@ -48,7 +49,7 @@ let handler = async (m, { conn, args, command }) => {
   }
 };
 
-handler.help = ['play <nombre o link>', 'ytmp3 <nombre o link>', 'play2 <nombre o link>'];
+handler.help = ['play', 'ytmp3', 'play2'];
 handler.tags = ['downloader'];
 handler.command = /^(play|ytmp3|play2)$/i;
 
