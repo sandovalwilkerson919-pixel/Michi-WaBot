@@ -24,18 +24,18 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
       if (search && search.title) videoInfo = search
     }
 
-    if (videoInfo.seconds > 3780) {
+    if (videoInfo?.seconds > 3780) {
       await conn.sendMessage(m.chat, { text: 'El video supera el límite de duración permitido (63 minutos).' }, { quoted: m })
       return
     }
 
-    let apiUrl = `https://myapiadonix.vercel.app/api/ytmp4?url=${encodeURIComponent(url)}`
+    let apiUrl = `https://myapiadonix.vercel.app/download/yt?url=${encodeURIComponent(url)}&format=mp4`
     let res = await fetch(apiUrl)
     if (!res.ok) throw new Error('Error al conectar con la API.')
     let json = await res.json()
-    if (!json.success) throw new Error('No se pudo obtener información del video.')
+    if (!json.status) throw new Error('No se pudo obtener información del video.')
 
-    let { title, quality, download, thumbnail } = json.data
+    let { title, quality, download, thumbnail } = json.result
     let duration = videoInfo?.timestamp || 'Desconocida'
 
     await conn.sendMessage(m.chat, {
@@ -52,8 +52,12 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
       }
     }, { quoted: m })
 
+    // Forzar a buffer para que no falle al mandar
+    let vidRes = await fetch(download)
+    let buffer = await vidRes.buffer()
+
     await conn.sendMessage(m.chat, {
-      video: { url: download },
+      video: buffer,
       mimetype: 'video/mp4',
       fileName: `${title}.mp4`
     }, { quoted: m })
