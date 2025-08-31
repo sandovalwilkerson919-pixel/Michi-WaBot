@@ -26,10 +26,14 @@ let handler = async (m, { conn, args }) => {
 
         let { title, download } = json.result
 
+        // bajamos el video como buffer
+        let vidRes = await fetch(download)
+        let buffer = await vidRes.buffer()
+
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
         await conn.sendMessage(m.chat, {
-            video: { url: download },
+            video: buffer,
             mimetype: 'video/mp4',
             fileName: `${title}.mp4`
         }, { quoted: m })
