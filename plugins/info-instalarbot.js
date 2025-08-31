@@ -47,7 +47,7 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
 
 ------------------------------------
 
-*—◉ 👽 OBTENER OTRO CODIGO QR EN TERMUX 👽*
+*—◉ 👽 OBTENER OTRO CODIGO EN TERMUX 👽*
 ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
 > 1- (Parar Bot con) Ctrl + C
 > 2- cd Michi-WaBot
@@ -55,7 +55,7 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
 > 4- git pull
 > 5- npm start
 
-*—◉ ESCRIBE O PEGA EN 1 LINEA:*
+*—◉ ESCRIBE O PEGA EN 2 LINEAS:*
 > 1- (Parar Bot con) Ctrl + C
 > 2- cd Michi-WaBot && rm -rf Sessions && git pull && npm start`.trim()
 
