@@ -70,8 +70,13 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       mentions: [m.sender]
     }, { quoted: fkontak })
 
+    // Aquí descargamos el archivo en buffer
+    let res = await fetch(apiURL)
+    if (!res.ok) throw new Error(`Error al descargar: ${res.status}`)
+    let buffer = await res.buffer()
+
     await conn.sendMessage(m.chat, {
-      [isAudio ? 'audio' : 'video']: { url: apiURL },
+      [isAudio ? 'audio' : 'video']: buffer,
       mimetype: isAudio ? 'audio/mpeg' : 'video/mp4',
       fileName: `${title.substring(0, 30)}.${isAudio ? 'mp3' : 'mp4'}`,
       ptt: false
