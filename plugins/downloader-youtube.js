@@ -24,24 +24,28 @@ let handler = async (m, { conn, args, command }) => {
       ? `https://myapiadonix.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`
       : `https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`;
 
+    
     const res = await axios.get(apiUrl);
     if (!res.data?.status || !res.data.url) return m.reply('😢 No se pudo obtener el archivo wey');
 
     const mediaUrl = res.data.url;
     const title = res.data.title;
-    const type = res.data.type; 
+    const type = res.data.type; // mp3 o mp4
 
+    
     if (type === 'mp3') {
       await conn.sendMessage(m.chat, {
         audio: { url: mediaUrl },
         mimetype: 'audio/mpeg',
-        fileName: `${title}.mp3`
+        fileName: `${title}.mp3`,
+        contextInfo: { externalAdReply: { title: "" } }
       });
     } else if (type === 'mp4') {
       await conn.sendMessage(m.chat, {
         video: { url: mediaUrl },
         mimetype: 'video/mp4',
-        fileName: `${title}.mp4`
+        fileName: `${title}.mp4`,
+        contextInfo: { externalAdReply: { title: "" } }
       });
     } else {
       m.reply('😢 Tipo de archivo no soportado wey');
