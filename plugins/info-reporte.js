@@ -3,7 +3,7 @@ import path from 'path';
 
 var handler = async (m, { conn, text }) => {
   if (!text) {
-    return conn.reply(m.chat, `⚠️ *Uso correcto:* /report <mensaje del error o reporte>`, m);
+    return conn.reply(m.chat, `⚠️ *Uso correcto:* /report <mensaje del error>`, m);
   }
 
   try {
