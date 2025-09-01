@@ -1,8 +1,5 @@
-import fetch from 'node-fetch'  
-global.fetch = fetch
-
-import pkg from 'adonix-scraper'
-const { ytmp4 } = pkg
+import scraper from 'adonix-scraper'
+const { ytmp4 } = scraper
 
 const handler = async (msg, { conn, args }) => {
   const chatId = msg.key.remoteJid
@@ -17,9 +14,7 @@ const handler = async (msg, { conn, args }) => {
   const url = args[0]
 
   try {
-    await conn.sendMessage(chatId, {
-      react: { text: '⏳', key: msg.key }
-    })
+    await conn.sendMessage(chatId, { react: { text: '⏳', key: msg.key } })
 
     const result = await ytmp4(url)
 
@@ -28,17 +23,13 @@ const handler = async (msg, { conn, args }) => {
       caption: `🎥 *${result.title}*`
     }, { quoted: msg })
 
-    await conn.sendMessage(chatId, {
-      react: { text: '✅', key: msg.key }
-    })
+    await conn.sendMessage(chatId, { react: { text: '✅', key: msg.key } })
   } catch (e) {
     await conn.sendMessage(chatId, {
       text: '❌ Error al procesar el video: ' + e.message
     }, { quoted: msg })
 
-    await conn.sendMessage(chatId, {
-      react: { text: '❌', key: msg.key }
-    })
+    await conn.sendMessage(chatId, { react: { text: '❌', key: msg.key } })
   }
 }
 
