@@ -76,7 +76,7 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
           previewType: 'pdf',
           title: 'ᴇʟ ᴍᴇᴊᴏʀ ʙᴏᴛ ᴅᴇ ᴡʜᴀᴛsᴀᴘᴘ⁩',
           body: namebot,
-          thumbnail: 'https://camo.githubusercontent.com/5f40b50c86603441007ceba4f01670feef6bda14d7a9b3204fd291e0cb622603/68747470733a2f2f66696c65732e636174626f782e6d6f652f656c783334712e6a7067'//fs.readFileSync('./storage/img/menu.jpg') ,
+          thumbnail: 'https://camo.githubusercontent.com/5f40b50c86603441007ceba4f01670feef6bda14d7a9b3204fd291e0cb622603/68747470733a2f2f66696c65732e636174626f782e6d6f652f656c783334712e6a7067',//fs.readFileSync('./storage/img/menu.jpg'),
           sourceUrl: 'https://youtu.be/nUSEEmlZw2g/'
         }
       },
