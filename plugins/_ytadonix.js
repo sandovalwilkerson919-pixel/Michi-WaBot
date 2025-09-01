@@ -27,10 +27,10 @@ let handler = async (m, { conn, args }) => {
         const info = await ytdl.getInfo(url)
         const title = info.videoDetails.title
 
-        // Rutas temporales
+        
         const inputPath = path.join(__dirname, `yt_${Date.now()}.mp3`)
 
-        // Descargar el audio con ytdl-core
+        
         await new Promise((resolve, reject) => {
             const stream = ytdl(url, { filter: 'audioonly', quality: 'highestaudio' })
                 .pipe(fs.createWriteStream(inputPath))
@@ -48,7 +48,7 @@ let handler = async (m, { conn, args }) => {
 
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
-        // Limpiar archivo temporal
+       
         fs.unlinkSync(inputPath)
 
     } catch (e) {
@@ -58,5 +58,5 @@ let handler = async (m, { conn, args }) => {
     }
 }
 
-handler.command = ['ytmp3', 'play']
+handler.command = ['ytadonix']
 export default handler
