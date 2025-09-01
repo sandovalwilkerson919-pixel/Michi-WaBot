@@ -3,7 +3,7 @@ import fs from "fs"
 let handler = async (m, { conn }) => {
   let fkontak = {
     key: { 
-      remoteJid: "120363000000000000@g.us", 
+      remoteJid: "120363402280020652@g.us", 
       fromMe: false, 
       id: "MichiBot-MD", 
       participant: "0@s.whatsapp.net" 
