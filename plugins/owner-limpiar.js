@@ -3,7 +3,7 @@ import path from 'path';
 
 var handler = async (m, { conn }) => {
   await conn.reply(m.chat, `Iniciando limpieza de todos los *SubBots*, manteniendo creds.json...`, m);
-  m.react('⌛');
+  m.react('🕓');
 
   const baseDir = './JadiBots/';
   try {
@@ -22,7 +22,7 @@ var handler = async (m, { conn }) => {
 
       const files = await fs.readdir(botPath);
       if (files.length === 0) {
-        logs.push(`⚠️ SubBot ${bot} está vacío.`);
+        logs.push(`*「🌾」* SubBot ${bot} está vacío.`);
         continue;
       }
 
@@ -45,7 +45,7 @@ var handler = async (m, { conn }) => {
         }
       }
 
-      logs.push(`✅ SubBot ${bot} limpio, ${deletedInBot} archivos eliminados, creds.json intacto.`);
+      logs.push(`*「🧃」* SubBot ${bot} limpio, ${deletedInBot} archivos eliminados, creds.json intacto.`);
     }
 
     if (totalDeleted === 0) {
@@ -53,7 +53,7 @@ var handler = async (m, { conn }) => {
       await conn.reply(m.chat, `No se eliminaron archivos, solo creds.json está presente en todos los subBots.`, m);
     } else {
       m.react('✅');
-      let summary = `🧹 Limpieza completa de SubBots\nArchivos eliminados: ${totalDeleted}\n\n` + logs.join('\n');
+      let summary = `*「🧇」* Limpieza completa de SubBots\nArchivos eliminados: ${totalDeleted}\n\n` + logs.join('\n');
       await conn.reply(m.chat, summary, m);
     }
   } catch (error) {
