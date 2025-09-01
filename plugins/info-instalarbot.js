@@ -80,7 +80,7 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
           previewType: 'pdf',
           title: 'ᴇʟ ᴍᴇᴊᴏʀ ʙᴏᴛ ᴅᴇ ᴡʜᴀᴛsᴀᴘᴘ⁩',
           body: namebot,
-          thumbnail: buffer,//fs.readFileSync('./storage/img/menu.jpg'),
+          thumbnail: buffer,
           sourceUrl: 'https://youtu.be/nUSEEmlZw2g/'
         }
       },
