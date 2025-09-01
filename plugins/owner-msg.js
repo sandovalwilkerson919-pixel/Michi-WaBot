@@ -72,7 +72,7 @@ let handler = async (m, { conn }) => {
   }
 }
 
-handler.command = ['tes5''msg']
+handler.command = ['tes5','msg']
 //handler.owner = true
 
 export default handler
