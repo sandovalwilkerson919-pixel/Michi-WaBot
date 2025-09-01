@@ -1,32 +1,79 @@
+// Importamos el nombre del bot desde config.js
+import { namebot } from '../config.js'
+
 let handler = async (m, { conn }) => {
-  await conn.sendMessage(m.chat, {
-    interactiveMessage: {
-      body: { text: "✨ Menú de prueba ✨" },
-      footer: { text: "⭐ MichiBot-MD ⭐" },
-      header: { title: "📖 Selecciona una opción:" },
-      nativeFlowMessage: {
-        buttons: [
-          {
-            name: "single_select",
-            buttonParamsJson: JSON.stringify({
-              title: "Abrir Menú",
-              sections: [
-                {
-                  title: "Opciones",
-                  rows: [
-                    { header: "Menú", title: "Opción 1", id: "test1" },
-                    { header: "Menú", title: "Opción 2", id: "test2" },
-                    { header: "Menú", title: "Opción 3", id: "test3" }
+  // Mensaje falso de contacto (opcional, para citar)
+  let fkontak = {
+    key: { 
+      remoteJid: "120363402280020652@g.us", 
+      fromMe: false, 
+      id: "MichiBot-MD", 
+      participant: "0@s.whatsapp.net" 
+    },
+    message: { conversation: namebot }
+  }
+
+  try {
+    // Definimos el mensaje interactivo
+    const interactiveMsg = {
+      message: {
+        interactiveMessage: {
+          header: { 
+            title: "📖 Selecciona una categoría:" 
+          },
+          body: { 
+            text: "✨ *Menú de Comandos* ✨" 
+          },
+          footer: { 
+            text: namebot 
+          },
+          nativeFlowMessage: {
+            buttons: [
+              {
+                name: "single_select",
+                buttonParamsJson: JSON.stringify({
+                  title: "📌 Información",
+                  sections: [
+                    {
+                      title: "Información",
+                      rows: [
+                        { header: "Velocidad", title: "🤖 Velocidad del Bot", id: ".p" }
+                      ]
+                    },
+                    {
+                      title: "Creador y Colaboradores",
+                      rows: [
+                        { header: "Creadores", title: "👑 Contacto de los Creadores", id: ".owner" }
+                      ]
+                    },
+                    {
+                      title: "Extras",
+                      rows: [
+                        { header: "YT", title: "🎵 Audios de YT", id: ".play" },
+                        { header: "Menu", title: "🔧 Menu Lista", id: ".menulist" }
+                      ]
+                    }
                   ]
-                }
-              ]
-            })
+                })
+              }
+            ]
           }
-        ]
+        }
       }
     }
-  }, { quoted: m })
+
+    // Reacción rápida
+    await conn.sendMessage(m.chat, { react: { text: '📂', key: m.key } })
+
+    // Enviamos el menú como viewOnceMessage
+    await conn.sendMessage(m.chat, {
+      viewOnceMessage: interactiveMsg
+    }, { quoted: fkontak })
+
+  } catch (e) {
+    await conn.sendMessage(m.chat, { text: "❌ Error: " + e.message })
+  }
 }
 
-handler.command = ['t6']
+handler.command = /^t6$/i
 export default handler
