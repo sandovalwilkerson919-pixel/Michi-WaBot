@@ -1,23 +1,32 @@
 let handler = async (m, { conn }) => {
-  let listMessage = {
-    text: "✨ Menú de prueba ✨",
-    footer: "⭐ MichiBot-MD ⭐",
-    title: "📖 Selecciona una opción:",
-    buttonText: "Abrir Menú",
-    sections: [
-      {
-        title: "Opciones",
-        rows: [
-          { title: "Opción 1", rowId: "test1" },
-          { title: "Opción 2", rowId: "test2" },
-          { title: "Opción 3", rowId: "test3" }
+  await conn.sendMessage(m.chat, {
+    interactiveMessage: {
+      body: { text: "✨ Menú de prueba ✨" },
+      footer: { text: "⭐ MichiBot-MD ⭐" },
+      header: { title: "📖 Selecciona una opción:" },
+      nativeFlowMessage: {
+        buttons: [
+          {
+            name: "single_select",
+            buttonParamsJson: JSON.stringify({
+              title: "Abrir Menú",
+              sections: [
+                {
+                  title: "Opciones",
+                  rows: [
+                    { header: "Menú", title: "Opción 1", id: "test1" },
+                    { header: "Menú", title: "Opción 2", id: "test2" },
+                    { header: "Menú", title: "Opción 3", id: "test3" }
+                  ]
+                }
+              ]
+            })
+          }
         ]
       }
-    ]
-  }
-
-  await conn.sendMessage(m.chat, listMessage, { quoted: m })
+    }
+  }, { quoted: m })
 }
 
-handler.command = /^t6$/i
+handler.command = /^t7$/i
 export default handler
