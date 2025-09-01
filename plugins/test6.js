@@ -28,5 +28,5 @@ let handler = async (m, { conn }) => {
   }, { quoted: m })
 }
 
-handler.command = /^t7$/i
+handler.command = ['t6']
 export default handler
