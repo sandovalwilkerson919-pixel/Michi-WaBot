@@ -18,18 +18,18 @@ let handler = async (m, { conn, args }) => {
     try {
         await conn.sendMessage(m.chat, { react: { text: '🕓', key: m.key } })
 
-        let apiUrl = `https://myapiadonix.vercel.app/download/yt?url=${encodeURIComponent(url)}&format=mp3`
+        let apiUrl = `https://myapiadonix.vercel.app/download/ytmp3?url=${encodeURIComponent(url)}`
         let res = await fetch(apiUrl)
         let json = await res.json()
 
         if (!json.status) return m.reply('✐ No se pudo descargar el audio wey')
 
-        let { title, download } = json.result
+        let { title, url: downloadUrl } = json
 
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
         await conn.sendMessage(m.chat, {
-            audio: { url: download },
+            audio: { url: downloadUrl },
             mimetype: 'audio/mpeg',
             fileName: `${title}.mp3`
         }, { quoted: m })
@@ -40,5 +40,5 @@ let handler = async (m, { conn, args }) => {
     }
 }
 
-handler.command = ['play', 'ytmp3'] 
+handler.command = ['play', 'ytmp3']
 export default handler
