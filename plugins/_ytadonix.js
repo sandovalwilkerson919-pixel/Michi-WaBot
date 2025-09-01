@@ -1,9 +1,7 @@
-import { adonixytdl } from 'adonix-scraper'
+import ytdl from 'ytdl-core'
 import yts from 'yt-search'
-import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
-import ffmpeg from 'fluent-ffmpeg'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -26,47 +24,39 @@ let handler = async (m, { conn, args }) => {
     try {
         await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-        const result = await adonixytdl(url)
+        const info = await ytdl.getInfo(url)
+        const title = info.videoDetails.title
 
-        
-        const audioRes = await fetch(result.mp3)
-        const audioBuffer = await audioRes.buffer()
+        // Rutas temporales
+        const inputPath = path.join(__dirname, `yt_${Date.now()}.mp3`)
 
-      
-        const inputPath = path.join(__dirname, `temp_${Date.now()}.mp3`)
-        const outputPath = path.join(__dirname, `bass_${Date.now()}.mp3`)
-
-        fs.writeFileSync(inputPath, audioBuffer)
-
-        
+        // Descargar el audio con ytdl-core
         await new Promise((resolve, reject) => {
-            ffmpeg(inputPath)
-                .audioFilter('bass=g=10') 
-                .save(outputPath)
-                .on('end', resolve)
-                .on('error', reject)
+            const stream = ytdl(url, { filter: 'audioonly', quality: 'highestaudio' })
+                .pipe(fs.createWriteStream(inputPath))
+            stream.on('finish', resolve)
+            stream.on('error', reject)
         })
 
-        const finalBuffer = fs.readFileSync(outputPath)
+        const finalBuffer = fs.readFileSync(inputPath)
 
         await conn.sendMessage(m.chat, {
             audio: finalBuffer,
             mimetype: 'audio/mpeg',
-            fileName: `${result.title}.mp3`
+            fileName: `${title}.mp3`
         }, { quoted: m })
 
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
-        
+        // Limpiar archivo temporal
         fs.unlinkSync(inputPath)
-        fs.unlinkSync(outputPath)
 
     } catch (e) {
-        console.log(e)
+        console.error(e)
         await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
         m.reply('✐ Ocurrió un error wey, intenta otra vez')
     }
 }
 
-handler.command = ['ytadonix']
+handler.command = ['ytmp3', 'play']
 export default handler
