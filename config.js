@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import { fileURLToPath } from 'url'
 
 global.owner = [
-  ['50493732693', 'Ado', true],
+  ['['584125877491', 'Ado', true],
   ['51956931649'],
   ['156981591593126'],
   ['595972314588'],
@@ -12,7 +12,7 @@ global.owner = [
 global.mods = []
 global.prems = []
 
-global.namebot = '𝖠𝖨 | 𝖬𝗂𝖼𝗁𝗂 🧃'
+global.namebot = 'M-ster-bot 🧃'
 global.packname = '𝖬𝗂𝖼𝗁𝗂 ° 𝖶𝖺 🥞'
 global.author = '𝖠𝖽𝗈 | © 2025 🪸'
 global.moneda = '𝗠𝗮𝗻𝗴𝗼𝘀'
