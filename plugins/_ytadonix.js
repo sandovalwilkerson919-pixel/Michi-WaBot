@@ -1,39 +1,39 @@
-import scraper from 'adonix-scraper'
-const { ytmp4 } = scraper
+import { adonixytdl } from 'adonix-scraper'
+import yts from 'yt-search'
 
-const handler = async (msg, { conn, args }) => {
-  const chatId = msg.key.remoteJid
+let handler = async (m, { conn, args }) => {
+    if (!args[0]) return m.reply('✐ Pon un nombre de canción o enlace de YouTube wey')
 
-  if (!args[0]) {
-    await conn.sendMessage(chatId, {
-      text: '⚠️ Pasa el link de YouTube\n\nEjemplo: *.ytadonix https://youtu.be/dQw4w9WgXcQ*'
-    }, { quoted: msg })
-    return
-  }
+    let url
+    const query = args.join(' ')
 
-  const url = args[0]
+    if (query.startsWith('http')) {
+        url = query
+    } else {
+        let search = await yts(query)
+        if (!search || !search.videos || !search.videos.length) return m.reply('✐ No encontré la canción wey')
+        url = search.videos[0].url
+    }
 
-  try {
-    await conn.sendMessage(chatId, { react: { text: '⏳', key: msg.key } })
+    try {
+        await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-    const result = await ytmp4(url)
+        const result = await adonixytdl(url)
 
-    await conn.sendMessage(chatId, {
-      video: { url: result.url },
-      caption: `🎥 *${result.title}*`
-    }, { quoted: msg })
+        await conn.sendMessage(m.chat, {
+            audio: { url: result.mp3 },
+            mimetype: 'audio/mpeg',
+            fileName: `${result.title}.mp3`
+        }, { quoted: m })
 
-    await conn.sendMessage(chatId, { react: { text: '✅', key: msg.key } })
-  } catch (e) {
-    await conn.sendMessage(chatId, {
-      text: '❌ Error al procesar el video: ' + e.message
-    }, { quoted: msg })
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
-    await conn.sendMessage(chatId, { react: { text: '❌', key: msg.key } })
-  }
+    } catch (e) {
+        console.log(e)
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+        m.reply('✐ Ocurrió un error wey, intenta otra vez')
+    }
 }
 
 handler.command = ['ytadonix']
-handler.private = false
-
 export default handler
