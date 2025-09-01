@@ -13,8 +13,8 @@ global.mods = []
 global.prems = []
 
 global.namebot = 'M-ster-bot 🧃'
-global.packname = '𝖬𝗂𝖼𝗁𝗂 ° 𝖶𝖺 🥞'
-global.author = '𝖠𝖽𝗈 | © 2025 🪸'
+global.packname = 'M-ster-bot 🥞'
+global.author = 'wilker | © 2025 🪸'
 global.moneda = '𝗠𝗮𝗻𝗴𝗼𝘀'
 
 
