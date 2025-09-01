@@ -12,9 +12,9 @@ let handler = async (m, { conn }) => {
   }
 
   const listMessage = {
+    text: "✨ *Menú de Comandos* ✨",
+    footer: namebot,   // ← usa tu variable
     title: "📖 Selecciona una categoría:",
-    description: "✨ *Menú de Comandos* ✨",
-    footer: "⭐ MichiBot-MD ⭐", // en Baileys es "footer" no "footerText"
     buttonText: "Menu Lista",
     sections: [
       {
@@ -40,12 +40,7 @@ let handler = async (m, { conn }) => {
   }
 
   await conn.sendMessage(m.chat, { react: { text: '📂', key: m.key } })
-
-  await conn.sendMessage(
-    m.chat,
-    { listMessage }, // 👈 aquí ya va directo
-    { quoted: fkontak }
-  )
+  await conn.sendMessage(m.chat, listMessage, { quoted: fkontak })
 }
 
 handler.command = /^t6$/i
