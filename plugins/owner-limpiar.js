@@ -6,7 +6,7 @@ var handler = async (m, { conn }) => {
     return conn.reply(m.chat, `Usa este comando solo en el número principal del bot.`, m);
   }
 
-  await conn.reply(m.chat, `Iniciando limpieza de todos los subBots, manteniendo creds.json...`, m);
+  await conn.reply(m.chat, `Iniciando limpieza de todos los *SubBots*, manteniendo creds.json...`, m);
   m.react('⌛');
 
   const baseDir = './JadiBots/';
@@ -40,10 +40,10 @@ var handler = async (m, { conn }) => {
 
     if (totalDeleted === 0) {
       m.react('ℹ️');
-      await conn.reply(m.chat, `No había archivos que eliminar, solo creds.json está presente.`, m);
+      await conn.reply(m.chat, `No había archivos que eliminar, solo los creds.json están presente.`, m);
     } else {
       m.react('✅');
-      await conn.reply(m.chat, `Se eliminaron ${totalDeleted} archivos de los subBots, creds.json quedó intacto.`, m);
+      await conn.reply(m.chat, `Se eliminaron ${totalDeleted} archivos de los subBots, Los creds.json quedaron intactos.`, m);
     }
   } catch (error) {
     console.error('Error limpiando subBots:', error);
