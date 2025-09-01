@@ -102,6 +102,3 @@ handler.command = ['instalarbot','iib']
 handler.help = ['instalarbot']
 handler.tags = ['info']
 export default handler
-
-
-//fs.readFileSync('./storage/img/menu.jpg')
