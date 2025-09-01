@@ -1,6 +1,7 @@
-// >>⟩ Creador original GianPoolS < github.com/GianPoolS >
-// >>⟩ No quites los créditos
+//[##] Creado por GianPoolS (github.com/GianPoolS)
+//[##] No quites los créditos
 
+import fetch from 'node-fetch'
 import fs from 'fs'
 
 const handler = async (m, { conn }) => {
@@ -15,6 +16,9 @@ const handler = async (m, { conn }) => {
       'vnd.openxmlformats-officedocument.wordprocessingml.document'
     ]
     const document = docTypes[Math.floor(Math.random() * docTypes.length)]
+
+    const res = await fetch('https://camo.githubusercontent.com/5f40b50c86603441007ceba4f01670feef6bda14d7a9b3204fd291e0cb622603/68747470733a2f2f66696c65732e636174626f782e6d6f652f656c783334712e6a7067')
+const buffer = await res.buffer()
 
     const text = `*—◉ 📥 DESCARGAR TERMUX AQUI 📥*
 > 1- termux.uptodown.com/android
@@ -76,7 +80,7 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
           previewType: 'pdf',
           title: 'ᴇʟ ᴍᴇᴊᴏʀ ʙᴏᴛ ᴅᴇ ᴡʜᴀᴛsᴀᴘᴘ⁩',
           body: namebot,
-          thumbnail: fs.readFileSync('./storage/img/menu.jpg'),
+          thumbnail: buffer,//fs.readFileSync('./storage/img/menu.jpg'),
           sourceUrl: 'https://youtu.be/nUSEEmlZw2g/'
         }
       },
