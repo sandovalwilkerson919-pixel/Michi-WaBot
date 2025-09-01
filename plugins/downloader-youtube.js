@@ -26,10 +26,15 @@ let handler = async (m, { conn, args }) => {
 
         let { title, url: downloadUrl } = json
 
+        // Descarga el buffer del audio
+        let audioRes = await fetch(downloadUrl)
+        if (!audioRes.ok) throw new Error(`Error al descargar el audio: ${audioRes.statusText}`)
+        let buffer = await audioRes.buffer()
+
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
         await conn.sendMessage(m.chat, {
-            audio: { url: downloadUrl },
+            audio: buffer,
             mimetype: 'audio/mpeg',
             fileName: `${title}.mp3`
         }, { quoted: m })
