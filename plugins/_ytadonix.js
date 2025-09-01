@@ -35,5 +35,5 @@ let handler = async (m, { conn, args }) => {
     }
 }
 
-handler.command = ['ytadonix']
+handler.command = ['play', 'ytmp3', 'ytadonix']
 export default handler
