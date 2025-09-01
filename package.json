@@ -37,7 +37,7 @@
     "awesome-phonenumber": "^3.4.0",
     "google-libphonenumber": "3.2.38",
     "axios": "^1.1.2",
-    "adonix-scraper": "^2.2.0",
+    "adonix-scraper": "^2.2.2",
     "acrcloud": "^1.4.0",
     "cfonts": "^3.1.1",
     "chalk": "^5.1.0",
