@@ -1,36 +1,44 @@
 import pkg from 'adonix-scraper'
-import fetch from 'node-fetch'
-
 const { ytmp4 } = pkg
 
 const handler = async (msg, { conn, args }) => {
   const chatId = msg.key.remoteJid
 
   if (!args[0]) {
-    return conn.sendMessage(chatId, {
-      text: '👉 Pásame un link de YouTube we'
+    await conn.sendMessage(chatId, {
+      text: '⚠️ Pasa el link de YouTube\n\nEjemplo: *.ytadonix https://youtu.be/dQw4w9WgXcQ*'
     }, { quoted: msg })
+    return
   }
 
-  await conn.sendMessage(chatId, {
-    react: { text: '📥', key: msg.key }
-  })
+  const url = args[0]
 
   try {
-    const url = args[0]
+    
+    await conn.sendMessage(chatId, {
+      react: { text: '⏳', key: msg.key }
+    })
+
     const result = await ytmp4(url)
-    const response = await fetch(result.url)
-    const buffer = await response.arrayBuffer()
 
     await conn.sendMessage(chatId, {
-      video: Buffer.from(buffer),
-      caption: `🎬 ${result.title}`
+      video: { url: result.url },
+      caption: `🎥 *${result.title}*`
     }, { quoted: msg })
 
-  } catch (err) {
+    
     await conn.sendMessage(chatId, {
-      text: `❌ Error: ${err.message}`
+      react: { text: '✅', key: msg.key }
+    })
+  } catch (e) {
+    await conn.sendMessage(chatId, {
+      text: '❌ Error al procesar el video: ' + e.message
     }, { quoted: msg })
+
+    
+    await conn.sendMessage(chatId, {
+      react: { text: '❌', key: msg.key }
+    })
   }
 }
 
