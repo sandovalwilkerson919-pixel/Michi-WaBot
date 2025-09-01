@@ -1,3 +1,7 @@
+//[##] Creado por GianPoolS (github.con/GianPoolS)
+//[##] No quites los créditos
+
+import fetch from 'node-fetch'
 import fs from 'fs'
 import pkg from '@whiskeysockets/baileys'
 const { generateWAMessageFromContent, prepareWAMessageMedia, proto } = pkg
@@ -6,6 +10,12 @@ let handler = async (m, { conn }) => {
   // Escribe el numero antes del @
   const destinatario = '50@s.whatsapp.net'
   try {
+
+    // === USAR LINK ===
+    //const res = await fetch('https://ejemplo.com/imagen.jpg')
+    const imagenBuffer = await res.buffer()
+
+    // === USAR LOCAL ===
     const imagenBuffer = fs.readFileSync('./storage/img/menu.jpg')
 
     // Prepara el media (imagen)
@@ -62,7 +72,7 @@ let handler = async (m, { conn }) => {
   }
 }
 
-handler.command = ['tes5']
+handler.command = ['tes5''msg']
 //handler.owner = true
 
 export default handler
