@@ -1,17 +1,19 @@
-import { ytmp4 } from 'adonix-scraper'
+import pkg from 'adonix-scraper'
 import fetch from 'node-fetch'
+
+const { ytmp4 } = pkg
 
 const handler = async (msg, { conn, args }) => {
   const chatId = msg.key.remoteJid
 
   if (!args[0]) {
     return conn.sendMessage(chatId, {
-      text: '👉 Pásame un link de YouTube',
+      text: '👉 Pásame un link de YouTube we'
     }, { quoted: msg })
   }
 
   await conn.sendMessage(chatId, {
-    react: { text: '🕓', key: msg.key }
+    react: { text: '📥', key: msg.key }
   })
 
   try {
