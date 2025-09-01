@@ -43,7 +43,7 @@ const handler = async (msg, { conn, args }) => {
 }
 
 handler.command = ['ytadonix']
-handler.group = true
+handler.group = false
 handler.private = false
 
 export default handler
