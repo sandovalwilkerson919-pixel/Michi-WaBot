@@ -1,5 +1,4 @@
-import ytdl from 'ytdl-core'
-import yts from 'yt-search'
+import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -10,12 +9,13 @@ const __dirname = path.dirname(__filename)
 let handler = async (m, { conn, args }) => {
     if (!args[0]) return m.reply('✐ Pon un nombre de canción o enlace de YouTube wey')
 
-    let url
     const query = args.join(' ')
+    let url
 
     if (query.startsWith('http')) {
         url = query
     } else {
+        const yts = (await import('yt-search')).default
         let search = await yts(query)
         if (!search || !search.videos || !search.videos.length) return m.reply('✐ No encontré la canción wey')
         url = search.videos[0].url
@@ -24,22 +24,17 @@ let handler = async (m, { conn, args }) => {
     try {
         await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-        const info = await ytdl.getInfo(url)
-        const title = info.videoDetails.title
+        const response = await axios.post('https://api.savetube.su/api/convert', { url })
+        if (response.data.status !== 'success') throw new Error('No se pudo generar el MP3')
 
-        
+        const downloadUrl = response.data.download_url
+        const title = url.split('v=')[1] || `audio_${Date.now()}`
         const inputPath = path.join(__dirname, `yt_${Date.now()}.mp3`)
 
-        
-        await new Promise((resolve, reject) => {
-            const stream = ytdl(url, { filter: 'audioonly', quality: 'highestaudio' })
-                .pipe(fs.createWriteStream(inputPath))
-            stream.on('finish', resolve)
-            stream.on('error', reject)
-        })
+        const mp3Data = await axios.get(downloadUrl, { responseType: 'arraybuffer' })
+        fs.writeFileSync(inputPath, mp3Data.data)
 
         const finalBuffer = fs.readFileSync(inputPath)
-
         await conn.sendMessage(m.chat, {
             audio: finalBuffer,
             mimetype: 'audio/mpeg',
@@ -48,7 +43,6 @@ let handler = async (m, { conn, args }) => {
 
         await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
-       
         fs.unlinkSync(inputPath)
 
     } catch (e) {
